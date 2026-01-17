@@ -4,7 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 
 
-def fetch_fox_html_without_ads(url: str, *, timeout_s: float = 10.0) -> str:
+def fetch_fox(url: str, *, timeout_s: float = 10.0) -> str:
     """
     Fetch HTML from the URL and return the text content inside the
     <div class="article-content-wrap"> with any elements having
@@ -24,9 +24,11 @@ def fetch_fox_html_without_ads(url: str, *, timeout_s: float = 10.0) -> str:
     text = content_wrap.get_text(separator="\n", strip=True)
     return text
 
+
 if __name__ == "__main__":
     print(
-        fetch_fox_html_without_ads(
+        fetch_fox(
             "https://www.foxnews.com/tech/pornhub-hit-massive-user-data-leak-exposing-200-million-records"
         )
     )
+
