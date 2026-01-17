@@ -122,25 +122,24 @@ async def categorize_overall_sentiment(query: str, limit: int = 50, sort: str = 
     }
 
 
-async def search_posts_fast():
-    """Fast sentiment-analyzed Bluesky search with instant results."""
+async def search_posts_fast(query: str, sort: str = "latest", limit: int = 50):
+    """Fast sentiment-analyzed Bluesky search with instant results.
+    
+    Args:
+        query: Search query string
+        sort: Sort order - "latest" or "top" (default: "latest")
+        limit: Number of posts to retrieve, max 100 (default: 50)
+    """
     try:
-        query = input("Enter your search query: ").strip()
         if not query:
             print("No query provided. Exiting.")
             return
 
-        sort = input("Sort by (latest/top, default: latest): ").strip() or "latest"
         if sort not in ["latest", "top"]:
             print(f"Invalid sort option '{sort}', using 'latest'")
             sort = "latest"
 
-        limit = input("How many posts to retrieve? (default: 50, max: 100): ").strip()
-        limit = int(limit) if limit.isdigit() else 50
         limit = min(limit, 100)
-
-        print(f"\nSearching Bluesky for: '{query}' (up to {limit} posts, sorted by {sort})...")
-        print("Analyzing sentiment...")
 
         start_time = time.time()
 
@@ -182,4 +181,11 @@ async def search_posts_fast():
 
 
 if __name__ == "__main__":
-    asyncio.run(search_posts_fast())
+    import sys
+    
+    # Get parameters from command line or use defaults
+    query = sys.argv[1] if len(sys.argv) > 1 else input("Enter your search query: ").strip()
+    sort = sys.argv[2] if len(sys.argv) > 2 else (input("Sort by (latest/top, default: latest): ").strip() or "latest")
+    limit = int(sys.argv[3]) if len(sys.argv) > 3 else (int(input("How many posts to retrieve? (default: 50, max: 100): ").strip() or "50"))
+    
+    asyncio.run(search_posts_fast(query, sort, limit))

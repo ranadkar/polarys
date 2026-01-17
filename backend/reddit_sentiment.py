@@ -9,182 +9,94 @@ from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 load_dotenv()
 app_id = os.getenv("REDDIT_CLIENT_ID")
 client_secret = os.getenv("REDDIT_CLIENT_SECRET")
-
+reddit_user_agent = os.getenv("REDDIT_USER_AGENT")
 analyzer = SentimentIntensityAnalyzer()
 
 
-def get_async_reddit():
-    return asyncpraw.Reddit(
-        client_id=app_id,
-        client_secret=client_secret,
-        user_agent="android:" + app_id + ":v1.0 (by u/K6av6ai82j0zo8HB721)",
-    )
-
-
-async def get_reddit_search_data(
-    query: str, subreddit_name: str = "all", limit: int = 50
-):
-    """Fetch Reddit posts with sentiment analysis for any search query."""
-    reddit = get_async_reddit()
+async def search_reddit(reddit, query: str, subreddit_name: str = "all", limit: int = 50):
+    if not query:
+        return None
+    
     posts = []
+    
+    subreddit = await reddit.subreddit(subreddit_name)
+    async for submission in subreddit.search(query, limit=limit, sort="relevance"):
+        text_content = submission.title + " " + (submission.selftext or "")
+        sentiment_scores = analyzer.polarity_scores(text_content)
+        compound_score = sentiment_scores["compound"]
 
-    try:
-        subreddit = await reddit.subreddit(subreddit_name)
-        async for submission in subreddit.search(query, limit=limit, sort="relevance"):
-            text_content = (
-                submission.title
-                + " "
-                + (submission.selftext if submission.selftext else "")
-            )
-            sentiment_scores = analyzer.polarity_scores(text_content)
-            compound_score = sentiment_scores["compound"]
+        sentiment_category = (
+            "positive" if compound_score >= 0.05 
+            else "negative" if compound_score <= -0.05 
+            else "neutral"
+        )
 
-            if compound_score >= 0.05:
-                sentiment_category = "positive"
-            elif compound_score <= -0.05:
-                sentiment_category = "negative"
-            else:
-                sentiment_category = "neutral"
-
-            posts.append(
-                {
-                    "source": "Reddit",
-                    "id": submission.id,
-                    "title": submission.title,
-                    "username": f"u/{submission.author.name}"
-                    if submission.author
-                    else "u/[deleted]",
-                    "handle": submission.author.name
-                    if submission.author
-                    else "[deleted]",
-                    "contents": submission.selftext[:500]
-                    if submission.selftext
-                    else "[Link post]",
-                    "platform": "reddit",
-                    "date": submission.created_utc,
-                    "created_utc": submission.created_utc,
-                    "sentiment": sentiment_category,
-                    "sentiment_score": compound_score,
-                    "score": submission.score,
-                    "likes": submission.score,
-                    "num_comments": submission.num_comments,
-                    "comments": [],
-                    "url": f"https://reddit.com{submission.permalink}",
-                    "subreddit": submission.subreddit.display_name
-                    if submission.subreddit
-                    else "unknown",
-                    "ai_summary": f"{sentiment_category.title()} sentiment post about {submission.title[:50]}...",
-                }
-            )
-    finally:
-        await reddit.close()
-
-    return posts
-
-
-async def categorize_overall_sentiment(
-    query: str, subreddit_name: str = "all", limit: int = 50
-):
-    """Get overall sentiment analysis for a search query."""
-    posts = await get_reddit_search_data(query, subreddit_name, limit)
+        posts.append({
+            "source": "Reddit",
+            "id": submission.id,
+            "title": submission.title,
+            "username": f"u/{submission.author.name}" if submission.author else "u/[deleted]",
+            "handle": submission.author.name if submission.author else "[deleted]",
+            "contents": submission.selftext[:500] if submission.selftext else "[Link post]",
+            "platform": "reddit",
+            "date": submission.created_utc,
+            "created_utc": submission.created_utc,
+            "sentiment": sentiment_category,
+            "sentiment_score": compound_score,
+            "score": submission.score,
+            "likes": submission.score,
+            "num_comments": submission.num_comments,
+            "url": f"https://reddit.com{submission.permalink}",
+            "subreddit": submission.subreddit.display_name if submission.subreddit else "unknown",
+        })
 
     if not posts:
-        return {
-            "sentiment": "No sentiment data available",
-            "score": 0.0,
-            "post_count": 0,
-        }
+        return None
 
-    sentiment_scores = [post["sentiment_score"] for post in posts]
-    avg_sentiment = sum(sentiment_scores) / len(sentiment_scores)
+    # Calculate overall sentiment
+    avg_score = sum(p["sentiment_score"] for p in posts) / len(posts)
+    overall_sentiment = (
+        "Positive sentiment" if avg_score >= 0.05 
+        else "Negative sentiment" if avg_score <= -0.05 
+        else "Neutral sentiment"
+    )
 
-    if avg_sentiment >= 0.05:
-        category = "Positive sentiment"
-    elif avg_sentiment <= -0.05:
-        category = "Negative sentiment"
-    else:
-        category = "Neutral sentiment"
-
-    return {
-        "sentiment": category,
-        "score": avg_sentiment,
+    # Save results
+    output_file = f"sentiment_analysis_{subreddit_name}_{query.replace(' ', '_')}_{len(posts)}.json"
+    result = {
+        "query": query,
+        "subreddit": subreddit_name,
+        "overall_sentiment": overall_sentiment,
+        "average_score": avg_score,
         "post_count": len(posts),
         "posts": posts,
+        "timestamp": time.time(),
     }
+    
+    with open(output_file, "w", encoding="utf-8") as f:
+        json.dump(result, f, indent=2, ensure_ascii=False)
 
-
-async def search_posts_fast():
-    """Fast sentiment-analyzed Reddit search with instant results."""
-    try:
-        query = input("Enter your search query: ").strip()
-        if not query:
-            print("No query provided. Exiting.")
-            return
-
-        subreddit_name = (
-            input("Enter subreddit to search (default: all): ").strip() or "all"
-        )
-        limit = input("How many posts to retrieve? (default: 50): ").strip()
-        limit = int(limit) if limit.isdigit() else 50
-
-        print(f"\nSearching r/{subreddit_name} for: '{query}' (up to {limit} posts)...")
-        print("Analyzing sentiment...")
-
-        start_time = time.time()
-
-        # Get posts with sentiment analysis
-        result = await categorize_overall_sentiment(query, subreddit_name, limit)
-        posts = result["posts"]
-
-        elapsed = time.time() - start_time
-
-        if not posts:
-            print("No results found.")
-            return
-
-        # Save results
-        output_file = f"sentiment_analysis_{subreddit_name}_{query.replace(' ', '_')}_{len(posts)}.json"
-        with open(output_file, "w", encoding="utf-8") as f:
-            json.dump(
-                {
-                    "query": query,
-                    "subreddit": subreddit_name,
-                    "overall_sentiment": result["sentiment"],
-                    "average_score": result["score"],
-                    "post_count": result["post_count"],
-                    "posts": posts,
-                    "timestamp": time.time(),
-                },
-                f,
-                indent=2,
-                ensure_ascii=False,
-            )
-
-        print(f"\n{'=' * 60}")
-        print("⚡ SENTIMENT ANALYSIS COMPLETE!")
-        print(f"✓ Analyzed {len(posts)} posts in {elapsed:.1f}s")
-        print(f"✓ Speed: {len(posts) / elapsed:.1f} posts/sec")
-        print(f"✓ Overall Sentiment: {result['sentiment']}")
-        print(f"✓ Average Score: {result['score']:.3f}")
-        print(f"✓ Saved to: {output_file}")
-        print(f"{'=' * 60}")
-
-        # Show sentiment breakdown
-        positive = sum(1 for p in posts if p["sentiment"] == "positive")
-        negative = sum(1 for p in posts if p["sentiment"] == "negative")
-        neutral = sum(1 for p in posts if p["sentiment"] == "neutral")
-
-        print("\n📊 Sentiment Breakdown:")
-        print(f"   Positive: {positive} posts ({positive / len(posts) * 100:.1f}%)")
-        print(f"   Negative: {negative} posts ({negative / len(posts) * 100:.1f}%)")
-        print(f"   Neutral:  {neutral} posts ({neutral / len(posts) * 100:.1f}%)")
-
-    except Exception as e:
-        print(f"Error: {e}")
-        import traceback
-
-        traceback.print_exc()
+    print(f"Analysis complete. Saved to: {output_file}")
+    return result
 
 
 if __name__ == "__main__":
-    asyncio.run(search_posts_fast())
+    import sys
+    
+    async def main():
+        query = sys.argv[1] if len(sys.argv) > 1 else input("Enter your search query: ").strip()
+        subreddit_name = sys.argv[2] if len(sys.argv) > 2 else (input("Enter subreddit to search (default: all): ").strip() or "all")
+        limit = int(sys.argv[3]) if len(sys.argv) > 3 else (int(input("How many posts to retrieve? (default: 50): ").strip() or "50"))
+        
+        reddit = asyncpraw.Reddit(
+            client_id=app_id,
+            client_secret=client_secret,
+            user_agent=reddit_user_agent,
+        )
+        
+        try:
+            await search_reddit(reddit, query, subreddit_name, limit)
+        finally:
+            await reddit.close()
+    
+    asyncio.run(main())
