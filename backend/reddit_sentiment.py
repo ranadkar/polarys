@@ -53,8 +53,6 @@ async def get_reddit_search_data(query: str, subreddit_name: str = "all", limit:
                 "title": submission.title,
                 "username": f"u/{submission.author.name}" if submission.author else "u/[deleted]",
                 "handle": submission.author.name if submission.author else "[deleted]",
-                "avatar": avatar_url,
-                "content": submission.title + ("\n\n" + submission.selftext if submission.selftext else ""),
                 "contents": submission.selftext[:500] if submission.selftext else "[Link post]",
                 "platform": "reddit",
                 "date": submission.created_utc,
