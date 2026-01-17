@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Consensus &amp; Common Ground</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#64b4a0",
+                        "background-light": "#f6f7f7",
+                        "background-dark": "#151d1b",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1e2826", // slightly lighter than bg-dark
+                        "text-main": "#121716",
+                        "text-secondary": "#63837b",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .venn-text {
+            pointer-events: none;
+            user-select: none;
+        }
+        .venn-circle {
+            transition: all 0.3s ease;
+        }
+        .venn-circle:hover {
+            opacity: 0.9;
+            filter: drop-shadow(0px 4px 12px rgba(0,0,0,0.1));
+        }
+        /* Custom scrollbar for clean look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-main dark:text-gray-100 font-display transition-colors duration-200">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Top Navigation -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-[#ebf0ee] dark:border-gray-800 bg-surface-light dark:bg-surface-dark px-10 py-3 sticky top-0 z-50">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4 text-text-main dark:text-white">
+<div class="size-8 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-3xl">balance</span>
+</div>
+<h2 class="text-text-main dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">PolitiCheck</h2>
+</div>
+<nav class="hidden md:flex items-center gap-9">
+<a class="text-text-main dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium leading-normal" href="#">Analysis</a>
+<a class="text-text-main dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium leading-normal" href="#">Trends</a>
+<a class="text-text-main dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium leading-normal" href="#">About</a>
+</nav>
+</div>
+<div class="flex flex-1 justify-end gap-6 items-center">
+<div class="hidden md:flex w-full max-w-xs items-center rounded-lg bg-[#ebf0ee] dark:bg-gray-800 h-10 px-3">
+<span class="material-symbols-outlined text-text-secondary dark:text-gray-400">search</span>
+<input class="w-full bg-transparent border-none focus:ring-0 text-sm ml-2 text-text-main dark:text-white placeholder:text-text-secondary" placeholder="Search topics..."/>
+</div>
+<button class="flex items-center justify-center size-10 rounded-full bg-[#ebf0ee] dark:bg-gray-800 text-text-main dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+</button>
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-10 ring-2 ring-white dark:ring-gray-700 cursor-pointer" data-alt="User profile avatar showing a smiling person" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAxr1MicGk-8ugQeiZK1HY2cBSUg1o6N-_1lEyy2EFfh7UIV0Gphb6OQ0fg3RIa7iDuIq5sk_bvNTvo040VdBOUTWXQzIEU8HqcUfyTd0J3SF1lrixhLAJfqTqq5c1qnmnRXg_sWTVBQGltDtW080QZvcilJ5nk8siAVmIuqIFapwbMM5BXpPcOWZxAWUjTQUkHeXp8YvRNErOGkR2IAUWxGzQ0rgih7arKaP-BATZqTb41WBJn-EarPRaLCtTckJtzpMjHA3cihrI");'></div>
+</div>
+</header>
+<main class="flex-1 flex flex-col items-center py-8 px-4 sm:px-8 lg:px-40">
+<div class="w-full max-w-[1024px] flex flex-col gap-8">
+<!-- Breadcrumbs -->
+<div class="flex flex-wrap items-center gap-2 text-sm">
+<a class="text-text-secondary dark:text-gray-400 hover:text-primary transition-colors font-medium" href="#">Home</a>
+<span class="material-symbols-outlined text-[16px] text-text-secondary dark:text-gray-500">chevron_right</span>
+<a class="text-text-secondary dark:text-gray-400 hover:text-primary transition-colors font-medium" href="#">Topic Analysis</a>
+<span class="material-symbols-outlined text-[16px] text-text-secondary dark:text-gray-500">chevron_right</span>
+<span class="text-text-main dark:text-white font-semibold">Consensus View</span>
+</div>
+<!-- Page Heading -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+<div class="flex flex-col gap-2">
+<h1 class="text-text-main dark:text-white text-3xl md:text-4xl font-black leading-tight tracking-tight">
+                            Consensus: Healthcare Reform
+                        </h1>
+<p class="text-text-secondary dark:text-gray-400 text-base md:text-lg max-w-2xl">
+                            Visualizing shared beliefs and verified facts across the political spectrum to identify actionable middle ground.
+                        </p>
+</div>
+<div class="flex items-center gap-2 px-3 py-1.5 bg-green-50 dark:bg-green-900/20 rounded-full border border-green-100 dark:border-green-900/50">
+<span class="material-symbols-outlined text-green-600 dark:text-green-400 text-sm">trending_up</span>
+<span class="text-green-700 dark:text-green-400 text-sm font-bold">+12% Alignment</span>
+</div>
+</div>
+<!-- Venn Diagram Hero Section -->
+<div class="w-full bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm border border-slate-100 dark:border-gray-800 p-8 flex flex-col items-center">
+<div class="w-full flex justify-between items-center mb-6">
+<h3 class="text-lg font-bold text-text-main dark:text-white">Belief Overlap Analysis</h3>
+<button class="text-primary hover:text-primary/80 text-sm font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-lg">download</span> Export Data
+                        </button>
+</div>
+<div class="relative w-full max-w-[600px] aspect-[4/3] md:aspect-[16/9] flex items-center justify-center">
+<svg class="w-full h-full drop-shadow-xl" viewbox="0 0 600 350" xmlns="http://www.w3.org/2000/svg">
+<!-- Left Circle (Democrat) -->
+<circle class="venn-circle fill-[#E8EFF2] dark:fill-[#2c3e50] opacity-90 stroke-white dark:stroke-gray-800 stroke-2" cx="230" cy="175" r="130"></circle>
+<!-- Right Circle (Republican) -->
+<circle class="venn-circle fill-[#F2EDE8] dark:fill-[#4a4036] opacity-90 stroke-white dark:stroke-gray-800 stroke-2" cx="370" cy="175" r="130"></circle>
+<!-- Intersection Highlight (Consensus) -->
+<path class="opacity-20 dark:opacity-40" d="M 300 66 A 130 130 0 0 1 300 284 A 130 130 0 0 1 300 66" fill="#64b4a0"></path>
+<!-- Labels -->
+<text class="venn-text text-sm font-bold fill-[#546e7a] dark:fill-gray-300" text-anchor="middle" x="160" y="160">Democrat</text>
+<text class="venn-text text-xs fill-[#78909c] dark:fill-gray-400" text-anchor="middle" x="160" y="180">Perspective</text>
+<text class="venn-text text-2xl font-black fill-[#546e7a] dark:fill-gray-300" text-anchor="middle" x="160" y="205">33%</text>
+<text class="venn-text text-sm font-bold fill-[#8d6e63] dark:fill-gray-300" text-anchor="middle" x="440" y="160">Republican</text>
+<text class="venn-text text-xs fill-[#a1887f] dark:fill-gray-400" text-anchor="middle" x="440" y="180">Perspective</text>
+<text class="venn-text text-2xl font-black fill-[#8d6e63] dark:fill-gray-300" text-anchor="middle" x="440" y="205">33%</text>
+<!-- Center Label -->
+<text class="venn-text text-sm font-bold fill-primary dark:fill-primary" text-anchor="middle" x="300" y="150">Consensus</text>
+<text class="venn-text text-4xl font-black fill-[#121716] dark:fill-white" style="text-shadow: 0 2px 4px rgba(255,255,255,0.5);" text-anchor="middle" x="300" y="195">34%</text>
+<text class="venn-text text-xs font-medium fill-[#121716] dark:fill-gray-300" text-anchor="middle" x="300" y="220">Shared Ground</text>
+<!-- Connecting lines for aesthetics -->
+<line stroke="#64b4a0" stroke-dasharray="4 4" stroke-width="2" x1="300" x2="300" y1="230" y2="260"></line>
+<circle cx="300" cy="265" fill="#64b4a0" r="3"></circle>
+</svg>
+<!-- Floating Tooltip (Static for design) -->
+<div class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg border border-primary/20 flex gap-4 text-xs font-medium">
+<div class="flex items-center gap-2">
+<span class="size-2 rounded-full bg-[#E8EFF2] dark:bg-[#2c3e50] border border-gray-200"></span> Unique
+                            </div>
+<div class="flex items-center gap-2">
+<span class="size-2 rounded-full bg-primary"></span> Common Ground
+                            </div>
+</div>
+</div>
+</div>
+<!-- Analysis Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Shared Values Card -->
+<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl border border-slate-100 dark:border-gray-800 shadow-sm flex flex-col h-full">
+<div class="flex items-center gap-3 mb-6">
+<div class="p-2 bg-primary/10 rounded-lg text-primary">
+<span class="material-symbols-outlined">handshake</span>
+</div>
+<div>
+<h3 class="font-bold text-lg text-text-main dark:text-white">Shared Values</h3>
+<p class="text-xs text-text-secondary dark:text-gray-400">Core ethical alignments detected in discourse</p>
+</div>
+</div>
+<ul class="flex flex-col gap-3 flex-1">
+<li class="flex items-start gap-3 p-3 rounded-lg bg-[#f9fbfa] dark:bg-gray-800/50 border border-transparent hover:border-primary/20 transition-colors">
+<span class="material-symbols-outlined text-primary text-xl mt-0.5">check_circle</span>
+<div>
+<span class="block font-semibold text-text-main dark:text-gray-200 text-sm">Transparency in Pricing</span>
+<span class="block text-xs text-text-secondary dark:text-gray-500 mt-1">Both sides prioritize clear costs for patients.</span>
+</div>
+</li>
+<li class="flex items-start gap-3 p-3 rounded-lg bg-[#f9fbfa] dark:bg-gray-800/50 border border-transparent hover:border-primary/20 transition-colors">
+<span class="material-symbols-outlined text-primary text-xl mt-0.5">check_circle</span>
+<div>
+<span class="block font-semibold text-text-main dark:text-gray-200 text-sm">Protection of Pre-existing Conditions</span>
+<span class="block text-xs text-text-secondary dark:text-gray-500 mt-1">Universal agreement on coverage continuity.</span>
+</div>
+</li>
+<li class="flex items-start gap-3 p-3 rounded-lg bg-[#f9fbfa] dark:bg-gray-800/50 border border-transparent hover:border-primary/20 transition-colors">
+<span class="material-symbols-outlined text-primary text-xl mt-0.5">check_circle</span>
+<div>
+<span class="block font-semibold text-text-main dark:text-gray-200 text-sm">Reducing Administrative Waste</span>
+<span class="block text-xs text-text-secondary dark:text-gray-500 mt-1">Consensus on streamlining bureaucracy.</span>
+</div>
+</li>
+</ul>
+</div>
+<!-- Agreed-upon Facts Card -->
+<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl border border-slate-100 dark:border-gray-800 shadow-sm flex flex-col h-full">
+<div class="flex items-center gap-3 mb-6">
+<div class="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-blue-600 dark:text-blue-400">
+<span class="material-symbols-outlined">fact_check</span>
+</div>
+<div>
+<h3 class="font-bold text-lg text-text-main dark:text-white">Agreed-upon Facts</h3>
+<p class="text-xs text-text-secondary dark:text-gray-400">Data points accepted by both bases</p>
+</div>
+</div>
+<ul class="flex flex-col gap-3 flex-1">
+<li class="flex flex-col gap-2 p-3 rounded-lg bg-[#f9fbfa] dark:bg-gray-800/50 border border-slate-100 dark:border-gray-700">
+<div class="flex justify-between items-start">
+<span class="text-sm font-medium text-text-main dark:text-gray-200">Prescription costs rose 12% in 2023.</span>
+<span class="material-symbols-outlined text-green-600 text-[18px]" title="Verified">verified</span>
+</div>
+<div class="flex gap-2 mt-1">
+<span class="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-[10px] font-bold text-gray-600 dark:text-gray-300 rounded uppercase tracking-wide">CDC Data</span>
+<span class="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-[10px] font-bold text-gray-600 dark:text-gray-300 rounded uppercase tracking-wide">Bi-Partisan Report</span>
+</div>
+</li>
+<li class="flex flex-col gap-2 p-3 rounded-lg bg-[#f9fbfa] dark:bg-gray-800/50 border border-slate-100 dark:border-gray-700">
+<div class="flex justify-between items-start">
+<span class="text-sm font-medium text-text-main dark:text-gray-200">Current funding structure is insolvent by 2030.</span>
+<span class="material-symbols-outlined text-green-600 text-[18px]" title="Verified">verified</span>
+</div>
+<div class="flex gap-2 mt-1">
+<span class="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-[10px] font-bold text-gray-600 dark:text-gray-300 rounded uppercase tracking-wide">Treasury</span>
+</div>
+</li>
+<li class="flex flex-col gap-2 p-3 rounded-lg bg-[#f9fbfa] dark:bg-gray-800/50 border border-slate-100 dark:border-gray-700">
+<div class="flex justify-between items-start">
+<span class="text-sm font-medium text-text-main dark:text-gray-200">Hospital consolidation has increased locally.</span>
+<span class="material-symbols-outlined text-green-600 text-[18px]" title="Verified">verified</span>
+</div>
+<div class="flex gap-2 mt-1">
+<span class="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-[10px] font-bold text-gray-600 dark:text-gray-300 rounded uppercase tracking-wide">Market Analysis</span>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<!-- Bridging the Gap (AI Insight) -->
+<div class="relative overflow-hidden rounded-xl bg-surface-light dark:bg-surface-dark border-t-4 border-primary shadow-lg p-8">
+<div class="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+<span class="material-symbols-outlined text-9xl">psychology</span>
+</div>
+<div class="relative z-10 flex flex-col md:flex-row gap-8 items-start">
+<div class="flex-shrink-0 flex flex-col items-center gap-2 md:w-48">
+<div class="size-12 rounded-full bg-primary/20 flex items-center justify-center text-primary mb-2">
+<span class="material-symbols-outlined text-2xl">auto_awesome</span>
+</div>
+<h3 class="text-lg font-bold text-text-main dark:text-white text-center">Bridging The Gap</h3>
+<span class="text-[10px] uppercase tracking-widest text-text-secondary dark:text-gray-500 font-bold">AI Synthesis</span>
+</div>
+<div class="flex-1 space-y-4">
+<h4 class="text-xl font-bold text-text-main dark:text-gray-100">Path to Neutral Understanding</h4>
+<p class="text-base text-text-main dark:text-gray-300 leading-relaxed">
+                                While the rhetorical approaches differ significantly—with one side emphasizing "Universal Rights" and the other "Market Choice"—the data reveals a functional consensus on <span class="bg-primary/20 dark:bg-primary/30 px-1 rounded font-medium text-primary-dark">cost transparency</span> and <span class="bg-primary/20 dark:bg-primary/30 px-1 rounded font-medium text-primary-dark">waste reduction</span>. 
+                            </p>
+<p class="text-base text-text-main dark:text-gray-300 leading-relaxed">
+                                A productive neutral path involves reframing the debate away from <em>who pays</em> to <em>what we are paying for</em>. Focusing legislative efforts on standardized billing practices offers the highest probability of bi-partisan support (85% likelihood) without triggering ideological red lines on government mandate vs. private enterprise.
+                            </p>
+<div class="pt-4 flex gap-4">
+<button class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-white px-6 py-3 text-sm font-bold hover:bg-primary/90 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+<span class="material-symbols-outlined text-lg">forum</span>
+                                    Generate Conversation Starters
+                                </button>
+<button class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 dark:border-gray-700 bg-transparent text-text-main dark:text-gray-300 px-6 py-3 text-sm font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">
+<span class="material-symbols-outlined text-lg">content_copy</span>
+                                    Copy Summary
+                                </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="mt-auto py-8 text-center text-text-secondary dark:text-gray-600 text-sm">
+<p>© 2023 PolitiCheck. Promoting understanding through data.</p>
+</footer>
+</div>
+</body></html>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PoliticLens - Deep Dive: Carbon Tax</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1f637a",
+                        "primary-dark": "#164a5c",
+                        "accent-gold": "#E3C77D",
+                        "background-light": "#fafafa",
+                        "background-dark": "#22262a",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#2c3035",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"],
+                        "body": ["Manrope", "sans-serif"]
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display transition-colors duration-200">
+<!-- Top Navigation -->
+<header class="sticky top-0 z-50 border-b border-slate-200 dark:border-slate-800 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm">
+<div class="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex h-16 items-center justify-between">
+<!-- Logo -->
+<div class="flex items-center gap-3">
+<div class="flex h-8 w-8 items-center justify-center rounded bg-primary text-white">
+<span class="material-symbols-outlined text-xl">travel_explore</span>
+</div>
+<span class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">PoliticLens</span>
+</div>
+<!-- Nav Links -->
+<nav class="hidden md:flex gap-8">
+<a class="text-sm font-medium text-slate-600 hover:text-primary dark:text-slate-400 dark:hover:text-white transition-colors" href="#">Dashboard</a>
+<a class="text-sm font-medium text-primary dark:text-white transition-colors" href="#">Deep Dives</a>
+<a class="text-sm font-medium text-slate-600 hover:text-primary dark:text-slate-400 dark:hover:text-white transition-colors" href="#">Methodology</a>
+<a class="text-sm font-medium text-slate-600 hover:text-primary dark:text-slate-400 dark:hover:text-white transition-colors" href="#">Settings</a>
+</nav>
+<!-- User Profile -->
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-white transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="h-9 w-9 overflow-hidden rounded-full border border-slate-200 dark:border-slate-700 bg-center bg-cover" data-alt="User profile avatar of a woman" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBGnfPfkt92vVxI2Z_AT0FjJapkXxMvn8avbvH6koryxTIzM-fhO3fZ_XcomrpGWxDkyP5JU5WK9w34DteD88NiU3oodHo6Lo8Q7fbp2W9jmxiUbRlj5IXrN5tA49JHOFlCGC-g7q_FJP2-0aBpoTB22c29uQITFB8eNbdSV2uXDeUzSJvavna8UzcmBc8MZ_FCNtI1EH_c6sMaMmg5GxRw2JkUBLAXLOizLF7EUm08SUbIasZV5OaEQivmO-drh-JYgldwmVsSYQo');"></div>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Layout -->
+<div class="flex flex-col min-h-screen">
+<!-- Breadcrumbs & Heading Section -->
+<div class="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-6">
+<!-- Breadcrumbs -->
+<div class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mb-6">
+<a class="hover:text-primary dark:hover:text-white transition-colors" href="#">Home</a>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<a class="hover:text-primary dark:hover:text-white transition-colors" href="#">Dashboard</a>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<span class="font-semibold text-slate-900 dark:text-white">Deep Dive: Carbon Tax</span>
+</div>
+<!-- Page Heading -->
+<div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-8 border-b border-slate-200 dark:border-slate-800 pb-8">
+<div class="space-y-3 max-w-3xl">
+<div class="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary dark:text-primary-300">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+</span>
+                        Live Analysis
+                    </div>
+<h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
+                        Topic: The Economic Impact of Carbon Tax
+                    </h1>
+<p class="text-base text-slate-500 dark:text-slate-400 flex flex-wrap gap-x-6 gap-y-2">
+<span class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">dataset</span>
+                            Data Sources: r/Conservative, r/Politics, r/Libertarian
+                        </span>
+<span class="hidden sm:inline text-slate-300 dark:text-slate-700">|</span>
+<span class="flex items-center gap-2 font-medium text-slate-700 dark:text-slate-300">
+                             Total Posts Analyzed: 12.4k (Cons) / 14.2k (Lib)
+                        </span>
+</p>
+</div>
+<div class="flex gap-3">
+<button class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 shadow-sm hover:bg-slate-50 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-surface-dark dark:text-slate-200 dark:hover:bg-slate-800 transition-all">
+<span class="material-symbols-outlined text-[20px]">share</span>
+                        Share
+                    </button>
+<button class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-bold text-white shadow-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all">
+<span class="material-symbols-outlined text-[20px]">download</span>
+                        Export Report
+                    </button>
+</div>
+</div>
+</div>
+<!-- Split Screen Container -->
+<main class="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pb-20 flex-grow">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 xl:gap-12 relative">
+<!-- Vertical Divider (Visual only, hidden on mobile) -->
+<div class="hidden lg:block absolute left-1/2 top-0 bottom-0 w-px bg-slate-200 dark:bg-slate-800 -ml-px"></div>
+<!-- LEFT COLUMN: Conservative -->
+<div class="flex flex-col gap-6">
+<!-- Column Header -->
+<div class="sticky top-[80px] z-10 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur pb-4 border-b border-slate-200 dark:border-slate-800 lg:border-none">
+<div class="flex items-center justify-between">
+<h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
+<span class="w-1.5 h-6 rounded-full bg-slate-400 dark:bg-slate-600"></span>
+                                Conservative Perspective
+                            </h2>
+<span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Frequency: High</span>
+</div>
+</div>
+<!-- Argument Card 1 -->
+<article class="group relative flex flex-col gap-4 rounded-xl border border-slate-200 bg-surface-light p-6 shadow-sm transition-shadow hover:shadow-md dark:border-slate-700 dark:bg-surface-dark">
+<div class="flex items-start justify-between gap-4">
+<h3 class="text-lg font-bold leading-snug text-slate-900 dark:text-white">Burden on Small Business &amp; Operations</h3>
+<div class="shrink-0 rounded bg-accent-gold/15 px-2.5 py-1 text-xs font-bold text-yellow-700 dark:text-accent-gold border border-accent-gold/20">
+                                Nuance: 7.2
+                            </div>
+</div>
+<!-- Evidence Block -->
+<div class="rounded-lg bg-slate-50 p-4 dark:bg-slate-800/50">
+<div class="flex items-center gap-3 mb-2">
+<div class="h-6 w-6 rounded-full bg-orange-100 flex items-center justify-center text-[10px] font-bold text-orange-700">u/b</div>
+<span class="text-xs font-medium text-slate-500">u/business_owner • r/Conservative</span>
+<span class="text-xs text-slate-400">• 2y ago</span>
+</div>
+<p class="text-sm leading-relaxed text-slate-700 dark:text-slate-300 font-serif italic">
+                                "My operational costs will rise by roughly 15% immediately. We operate on thin margins as is. This isn't about not caring for the environment, it's about basic math. Who absorbs that cost? The consumer."
+                            </p>
+<div class="mt-3 flex items-center gap-1 text-xs font-bold text-primary dark:text-primary-300">
+<span class="material-symbols-outlined text-[16px]">arrow_upward</span>
+                                1.2k Upvotes
+                            </div>
+</div>
+<!-- Rebuttal Section -->
+<div class="mt-2 pt-4 border-t border-slate-100 dark:border-slate-700">
+<h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Common Liberal Rebuttals</h4>
+<ul class="space-y-2">
+<li class="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined text-[18px] text-slate-400 mt-0.5">chat_bubble</span>
+<span>Tax revenue is often redistributed as dividends to citizens, boosting spending power.</span>
+</li>
+<li class="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined text-[18px] text-slate-400 mt-0.5">chat_bubble</span>
+<span>Small businesses can receive tax credits to offset transition costs.</span>
+</li>
+</ul>
+</div>
+</article>
+<!-- Argument Card 2 -->
+<article class="group relative flex flex-col gap-4 rounded-xl border border-slate-200 bg-surface-light p-6 shadow-sm transition-shadow hover:shadow-md dark:border-slate-700 dark:bg-surface-dark">
+<div class="flex items-start justify-between gap-4">
+<h3 class="text-lg font-bold leading-snug text-slate-900 dark:text-white">Energy Independence Risks</h3>
+<div class="shrink-0 rounded bg-accent-gold/15 px-2.5 py-1 text-xs font-bold text-yellow-700 dark:text-accent-gold border border-accent-gold/20">
+                                Nuance: 6.5
+                            </div>
+</div>
+<!-- Evidence Block -->
+<div class="rounded-lg bg-slate-50 p-4 dark:bg-slate-800/50">
+<div class="flex items-center gap-3 mb-2">
+<div class="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center text-[10px] font-bold text-blue-700">u/p</div>
+<span class="text-xs font-medium text-slate-500">u/patriot_energy • r/Libertarian</span>
+<span class="text-xs text-slate-400">• 5mo ago</span>
+</div>
+<p class="text-sm leading-relaxed text-slate-700 dark:text-slate-300 font-serif italic">
+                                "We finally achieved energy independence, and now we want to tax our own production capabilities? This just shifts leverage back to foreign oil producers who don't have these taxes."
+                            </p>
+<div class="mt-3 flex items-center gap-1 text-xs font-bold text-primary dark:text-primary-300">
+<span class="material-symbols-outlined text-[16px]">arrow_upward</span>
+                                890 Upvotes
+                            </div>
+</div>
+<!-- Rebuttal Section -->
+<div class="mt-2 pt-4 border-t border-slate-100 dark:border-slate-700">
+<h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Common Liberal Rebuttals</h4>
+<ul class="space-y-2">
+<li class="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined text-[18px] text-slate-400 mt-0.5">chat_bubble</span>
+<span>Renewable independence is more stable long-term than fossil fuel reliance.</span>
+</li>
+</ul>
+</div>
+</article>
+<!-- Visual End of List -->
+<div class="flex justify-center py-4 opacity-50">
+<span class="h-1 w-1 bg-slate-300 rounded-full mx-1"></span>
+<span class="h-1 w-1 bg-slate-300 rounded-full mx-1"></span>
+<span class="h-1 w-1 bg-slate-300 rounded-full mx-1"></span>
+</div>
+</div>
+<!-- RIGHT COLUMN: Liberal -->
+<div class="flex flex-col gap-6">
+<!-- Column Header -->
+<div class="sticky top-[80px] z-10 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur pb-4 border-b border-slate-200 dark:border-slate-800 lg:border-none">
+<div class="flex items-center justify-between">
+<h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
+<span class="w-1.5 h-6 rounded-full bg-primary/80 dark:bg-primary"></span>
+                                Liberal Perspective
+                            </h2>
+<span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Frequency: Very High</span>
+</div>
+</div>
+<!-- Argument Card 1 -->
+<article class="group relative flex flex-col gap-4 rounded-xl border border-slate-200 bg-surface-light p-6 shadow-sm transition-shadow hover:shadow-md dark:border-slate-700 dark:bg-surface-dark">
+<div class="flex items-start justify-between gap-4">
+<h3 class="text-lg font-bold leading-snug text-slate-900 dark:text-white">Long-term Climate Mitigation Cost</h3>
+<div class="shrink-0 rounded bg-accent-gold/15 px-2.5 py-1 text-xs font-bold text-yellow-700 dark:text-accent-gold border border-accent-gold/20">
+                                Nuance: 8.1
+                            </div>
+</div>
+<!-- Evidence Block -->
+<div class="rounded-lg bg-slate-50 p-4 dark:bg-slate-800/50">
+<div class="flex items-center gap-3 mb-2">
+<div class="h-6 w-6 rounded-full bg-green-100 flex items-center justify-center text-[10px] font-bold text-green-700">u/c</div>
+<span class="text-xs font-medium text-slate-500">u/climate_watcher • r/Politics</span>
+<span class="text-xs text-slate-400">• 1y ago</span>
+</div>
+<p class="text-sm leading-relaxed text-slate-700 dark:text-slate-300 font-serif italic">
+                                "The cost of inaction exceeds the tax by orders of magnitude. We are already paying for climate change through disaster relief and insurance premiums. The tax just prices in the externality."
+                            </p>
+<div class="mt-3 flex items-center gap-1 text-xs font-bold text-primary dark:text-primary-300">
+<span class="material-symbols-outlined text-[16px]">arrow_upward</span>
+                                3.5k Upvotes
+                            </div>
+</div>
+<!-- Rebuttal Section -->
+<div class="mt-2 pt-4 border-t border-slate-100 dark:border-slate-700">
+<h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Common Conservative Rebuttals</h4>
+<ul class="space-y-2">
+<li class="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined text-[18px] text-slate-400 mt-0.5">chat_bubble</span>
+<span>Current green technology cannot scale fast enough to replace fossil fuels without economic collapse.</span>
+</li>
+<li class="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined text-[18px] text-slate-400 mt-0.5">chat_bubble</span>
+<span>Developing nations like China and India will negate our emissions reductions.</span>
+</li>
+</ul>
+</div>
+</article>
+<!-- Argument Card 2 -->
+<article class="group relative flex flex-col gap-4 rounded-xl border border-slate-200 bg-surface-light p-6 shadow-sm transition-shadow hover:shadow-md dark:border-slate-700 dark:bg-surface-dark">
+<div class="flex items-start justify-between gap-4">
+<h3 class="text-lg font-bold leading-snug text-slate-900 dark:text-white">Stimulating Green Innovation</h3>
+<div class="shrink-0 rounded bg-accent-gold/15 px-2.5 py-1 text-xs font-bold text-yellow-700 dark:text-accent-gold border border-accent-gold/20">
+                                Nuance: 7.8
+                            </div>
+</div>
+<!-- Evidence Block -->
+<div class="rounded-lg bg-slate-50 p-4 dark:bg-slate-800/50">
+<div class="flex items-center gap-3 mb-2">
+<div class="h-6 w-6 rounded-full bg-purple-100 flex items-center justify-center text-[10px] font-bold text-purple-700">u/t</div>
+<span class="text-xs font-medium text-slate-500">u/tech_futurist • r/Futurology</span>
+<span class="text-xs text-slate-400">• 8mo ago</span>
+</div>
+<p class="text-sm leading-relaxed text-slate-700 dark:text-slate-300 font-serif italic">
+                                "A carbon tax provides the necessary market signal for VCs to pour money into carbon capture and fusion. Without a price on carbon, dirty energy remains artificially cheap."
+                            </p>
+<div class="mt-3 flex items-center gap-1 text-xs font-bold text-primary dark:text-primary-300">
+<span class="material-symbols-outlined text-[16px]">arrow_upward</span>
+                                2.1k Upvotes
+                            </div>
+</div>
+<!-- Rebuttal Section -->
+<div class="mt-2 pt-4 border-t border-slate-100 dark:border-slate-700">
+<h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Common Conservative Rebuttals</h4>
+<ul class="space-y-2">
+<li class="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined text-[18px] text-slate-400 mt-0.5">chat_bubble</span>
+<span>Government shouldn't pick winners and losers in the energy market.</span>
+</li>
+</ul>
+</div>
+</article>
+<!-- Visual End of List -->
+<div class="flex justify-center py-4 opacity-50">
+<span class="h-1 w-1 bg-slate-300 rounded-full mx-1"></span>
+<span class="h-1 w-1 bg-slate-300 rounded-full mx-1"></span>
+<span class="h-1 w-1 bg-slate-300 rounded-full mx-1"></span>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Floating Action Button for Mobile -->
+<div class="fixed bottom-6 right-6 lg:hidden">
+<button class="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-primary/30">
+<span class="material-symbols-outlined">vertical_split</span>
+</button>
+</div>
+<script>
+        // Simple dark mode toggle logic for demonstration purposes if user added a toggle button
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
+</body></html>

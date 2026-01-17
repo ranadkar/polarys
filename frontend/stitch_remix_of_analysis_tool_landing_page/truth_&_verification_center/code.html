@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Truth &amp; Verification Center</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2b3d4f",
+                        "background-light": "#f6f7f7",
+                        "background-dark": "#16191c",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1e2327",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans", "sans-serif"],
+                        "body": ["Public Sans", "sans-serif"],
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-primary dark:text-gray-100 min-h-screen flex overflow-hidden">
+<!-- Sidebar -->
+<aside class="w-64 flex-shrink-0 bg-surface-light dark:bg-surface-dark border-r border-gray-200 dark:border-gray-800 flex flex-col h-screen z-20 transition-all duration-300">
+<!-- Brand -->
+<div class="h-16 flex items-center px-6 border-b border-gray-100 dark:border-gray-800">
+<div class="flex items-center gap-2 text-primary dark:text-white">
+<span class="material-symbols-outlined text-primary dark:text-white" style="font-size: 28px;">policy</span>
+<div class="flex flex-col">
+<h1 class="text-base font-bold leading-tight tracking-tight">Truth Center</h1>
+<span class="text-[10px] text-gray-500 font-medium uppercase tracking-wider">Verification Tool</span>
+</div>
+</div>
+</div>
+<!-- Navigation -->
+<div class="flex-1 overflow-y-auto py-6 px-4 space-y-8">
+<!-- Main Menu -->
+<div>
+<h3 class="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Platform</h3>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-gray-500" style="font-size: 20px;">dashboard</span>
+                        Overview
+                    </a>
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-white bg-primary rounded-lg shadow-sm" href="#">
+<span class="material-symbols-outlined text-white" style="font-size: 20px;">fact_check</span>
+                        Claims Database
+                    </a>
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-gray-500" style="font-size: 20px;">folder_open</span>
+                        Source Index
+                    </a>
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-gray-500" style="font-size: 20px;">analytics</span>
+                        Analytics
+                    </a>
+</nav>
+</div>
+<!-- Filters -->
+<div>
+<h3 class="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Active Filters</h3>
+<div class="space-y-3 px-1">
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="relative flex items-center">
+<input checked="" class="peer h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary/20 transition-all" type="checkbox"/>
+</div>
+<span class="text-sm text-gray-600 dark:text-gray-300 group-hover:text-primary transition-colors">Verified</span>
+<span class="ml-auto text-xs text-green-600 bg-green-50 px-1.5 py-0.5 rounded">12</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="relative flex items-center">
+<input checked="" class="peer h-4 w-4 rounded border-gray-300 text-amber-500 focus:ring-amber-500/20 transition-all" type="checkbox"/>
+</div>
+<span class="text-sm text-gray-600 dark:text-gray-300 group-hover:text-primary transition-colors">Disputed</span>
+<span class="ml-auto text-xs text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">34</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="relative flex items-center">
+<input class="peer h-4 w-4 rounded border-gray-300 text-gray-500 focus:ring-gray-500/20 transition-all" type="checkbox"/>
+</div>
+<span class="text-sm text-gray-600 dark:text-gray-300 group-hover:text-primary transition-colors">Unsubstantiated</span>
+</label>
+</div>
+</div>
+</div>
+<!-- User Profile -->
+<div class="p-4 border-t border-gray-200 dark:border-gray-800">
+<div class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors">
+<div class="h-9 w-9 rounded-full bg-cover bg-center" data-alt="User profile avatar showing abstract initials" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDOvVTemgO8Cev9Y1iL20IYzRpnOg8TFwPWjF6HnBrhZTQ3ZPSLZzsSW8YfS-nLk8RK8SPJjolJ__UeabRIZULgHLIbu5wFPs_MizT2kcBC2JtQwco7h-hFQtCKYiD8r0E3gaXQ_5xjVHpMlHyXr0ZwUewr59jsjoqPJajmWlpX2V5CvJgfhBtvLOxxmDTMJgz4TmzcOoNgE-tDOMTUcAy4EEMBNig_JJrnM0oXqawOvms5uxL8Ts6D2c5_DX2oTIMcy073fJX-6Co');"></div>
+<div class="flex flex-col min-w-0">
+<p class="text-sm font-medium text-gray-900 dark:text-white truncate">Analyst Jane</p>
+<p class="text-xs text-gray-500 truncate">Level 3 Access</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col h-screen overflow-hidden relative">
+<!-- Top Bar -->
+<header class="h-16 flex items-center justify-between px-8 bg-surface-light dark:bg-surface-dark border-b border-gray-200 dark:border-gray-800 shrink-0">
+<h2 class="text-lg font-bold text-gray-900 dark:text-white tracking-tight">Commonly Cited Claims</h2>
+<div class="flex items-center gap-4">
+<div class="relative w-80">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-gray-400" style="font-size: 20px;">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-background-light dark:bg-background-dark border-none rounded-lg text-sm text-gray-900 dark:text-white placeholder-gray-500 focus:ring-1 focus:ring-primary" placeholder="Search claims, keywords, or sources..." type="text"/>
+</div>
+<button class="p-2 text-gray-500 hover:text-primary dark:hover:text-white transition-colors relative">
+<span class="material-symbols-outlined" style="font-size: 24px;">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-surface-light dark:border-surface-dark"></span>
+</button>
+</div>
+</header>
+<!-- Scrollable Canvas -->
+<div class="flex-1 overflow-y-auto p-8">
+<div class="max-w-[1400px] mx-auto flex flex-col gap-8">
+<!-- Quick Stats -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="bg-surface-light dark:bg-surface-dark p-5 rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col justify-between h-32 relative overflow-hidden group">
+<div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-primary text-6xl">fact_check</span>
+</div>
+<div>
+<p class="text-sm font-medium text-gray-500 uppercase tracking-wide">Claims Analyzed</p>
+<h3 class="text-3xl font-bold text-primary dark:text-white mt-1">142</h3>
+</div>
+<div class="flex items-center gap-1 text-green-600 text-sm font-medium">
+<span class="material-symbols-outlined text-base">trending_up</span>
+<span>+12% today</span>
+</div>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark p-5 rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col justify-between h-32 relative overflow-hidden group">
+<div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-primary text-6xl">verified</span>
+</div>
+<div>
+<p class="text-sm font-medium text-gray-500 uppercase tracking-wide">Verification Rate</p>
+<h3 class="text-3xl font-bold text-primary dark:text-white mt-1">68.4%</h3>
+</div>
+<div class="flex items-center gap-1 text-green-600 text-sm font-medium">
+<span class="material-symbols-outlined text-base">arrow_upward</span>
+<span>+5% vs avg</span>
+</div>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark p-5 rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col justify-between h-32 relative overflow-hidden group">
+<div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-amber-500 text-6xl">warning</span>
+</div>
+<div>
+<p class="text-sm font-medium text-gray-500 uppercase tracking-wide">Disputed Claims</p>
+<h3 class="text-3xl font-bold text-primary dark:text-white mt-1">34</h3>
+</div>
+<div class="flex items-center gap-1 text-amber-600 text-sm font-medium">
+<span class="material-symbols-outlined text-base">priority_high</span>
+<span>Needs Review</span>
+</div>
+</div>
+</div>
+<!-- Two Column Layout for Content -->
+<div class="flex flex-col lg:flex-row gap-8">
+<!-- Left: Claims Feed -->
+<div class="flex-1 flex flex-col gap-4">
+<div class="flex items-center justify-between pb-2 border-b border-gray-200 dark:border-gray-700">
+<h3 class="text-base font-bold text-primary dark:text-white">Recent Analysis Feed</h3>
+<button class="text-sm font-medium text-primary hover:text-primary/80 flex items-center gap-1">
+                                Sort by: Relevance <span class="material-symbols-outlined text-base">expand_more</span>
+</button>
+</div>
+<!-- Claim Card 1: Disputed -->
+<div class="group bg-surface-light dark:bg-surface-dark rounded-lg border border-gray-200 dark:border-gray-800 p-5 hover:shadow-md transition-all duration-200">
+<div class="flex justify-between items-start gap-4 mb-3">
+<div class="flex gap-3 items-center">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+<span class="material-symbols-outlined text-sm">warning</span> Disputed
+                                    </span>
+<span class="text-xs text-gray-500">Analyzed 2h ago</span>
+</div>
+<button class="text-gray-400 hover:text-primary dark:hover:text-white transition-colors">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</div>
+<h4 class="text-lg font-bold text-gray-900 dark:text-white mb-2 leading-snug">
+                                "Senator X voted to increase taxes on the middle class by 15% in the latest fiscal bill."
+                            </h4>
+<div class="bg-gray-50 dark:bg-gray-800/50 rounded-md p-3 mb-4 border-l-2 border-amber-400">
+<p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+<span class="font-semibold text-gray-900 dark:text-white">Context:</span> Analysis indicates the bill referenced (H.R. 402) specifically targets capital gains for incomes over $400k, not general income tax for the middle class bracket.
+                                </p>
+</div>
+<div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+<div class="flex items-center gap-4 text-xs text-gray-500">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-base">forum</span>
+<span>Echoed in r/politics, r/economy</span>
+</div>
+<div class="w-1 h-1 bg-gray-300 rounded-full"></div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-base">link</span>
+<span class="text-red-500 font-medium">Low reliability sources cited</span>
+</div>
+</div>
+<button class="text-sm font-semibold text-primary dark:text-blue-400 hover:underline">View Full Report</button>
+</div>
+</div>
+<!-- Claim Card 2: Verified -->
+<div class="group bg-surface-light dark:bg-surface-dark rounded-lg border border-gray-200 dark:border-gray-800 p-5 hover:shadow-md transition-all duration-200">
+<div class="flex justify-between items-start gap-4 mb-3">
+<div class="flex gap-3 items-center">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300 border border-green-200 dark:border-green-800">
+<span class="material-symbols-outlined text-sm">check_circle</span> Verified
+                                    </span>
+<span class="text-xs text-gray-500">Analyzed 4h ago</span>
+</div>
+<button class="text-gray-400 hover:text-primary dark:hover:text-white transition-colors">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</div>
+<h4 class="text-lg font-bold text-gray-900 dark:text-white mb-2 leading-snug">
+                                "Global temperatures in 2023 were the highest on record according to NASA data."
+                            </h4>
+<div class="bg-gray-50 dark:bg-gray-800/50 rounded-md p-3 mb-4 border-l-2 border-green-500">
+<p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+<span class="font-semibold text-gray-900 dark:text-white">Context:</span> Confirmed by multiple independent climate agencies (NOAA, Copernicus, NASA). Data aligns with the claim accurately.
+                                </p>
+</div>
+<div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+<div class="flex items-center gap-4 text-xs text-gray-500">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-base">forum</span>
+<span>Trending in r/science</span>
+</div>
+<div class="w-1 h-1 bg-gray-300 rounded-full"></div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-base">link</span>
+<span class="text-green-600 font-medium">High reliability sources</span>
+</div>
+</div>
+<button class="text-sm font-semibold text-primary dark:text-blue-400 hover:underline">View Full Report</button>
+</div>
+</div>
+<!-- Claim Card 3: Unsubstantiated -->
+<div class="group bg-surface-light dark:bg-surface-dark rounded-lg border border-gray-200 dark:border-gray-800 p-5 hover:shadow-md transition-all duration-200">
+<div class="flex justify-between items-start gap-4 mb-3">
+<div class="flex gap-3 items-center">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-800 dark:bg-gray-700/40 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
+<span class="material-symbols-outlined text-sm">help</span> Unsubstantiated
+                                    </span>
+<span class="text-xs text-gray-500">Analyzed 30m ago</span>
+</div>
+<button class="text-gray-400 hover:text-primary dark:hover:text-white transition-colors">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</div>
+<h4 class="text-lg font-bold text-gray-900 dark:text-white mb-2 leading-snug">
+                                "Leaked internal memos suggest Company Y is planning a massive pivot to blockchain."
+                            </h4>
+<div class="bg-gray-50 dark:bg-gray-800/50 rounded-md p-3 mb-4 border-l-2 border-gray-300">
+<p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+<span class="font-semibold text-gray-900 dark:text-white">Context:</span> Originates from a single anonymous forum post. No official documentation or corroborating insider reports found to date.
+                                </p>
+</div>
+<div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+<div class="flex items-center gap-4 text-xs text-gray-500">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-base">forum</span>
+<span>Seen in r/investing</span>
+</div>
+<div class="w-1 h-1 bg-gray-300 rounded-full"></div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-base">link</span>
+<span class="text-gray-500 font-medium">No external sources</span>
+</div>
+</div>
+<button class="text-sm font-semibold text-primary dark:text-blue-400 hover:underline">View Full Report</button>
+</div>
+</div>
+</div>
+<!-- Right Rail: Widgets -->
+<div class="w-full lg:w-80 flex-shrink-0 flex flex-col gap-6">
+<!-- Source Reliability Index -->
+<div class="bg-surface-light dark:bg-surface-dark rounded-lg border border-gray-200 dark:border-gray-800 p-5">
+<h3 class="text-sm font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary dark:text-white">shield</span>
+                                Source Reliability Index
+                            </h3>
+<div class="space-y-4">
+<div class="flex flex-col gap-1">
+<div class="flex justify-between text-xs font-medium">
+<span class="text-gray-700 dark:text-gray-200">AP News</span>
+<span class="text-green-600">98% Trust</span>
+</div>
+<div class="h-1.5 w-full bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+<div class="h-full bg-green-500 rounded-full" style="width: 98%"></div>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between text-xs font-medium">
+<span class="text-gray-700 dark:text-gray-200">Reuters</span>
+<span class="text-green-600">96% Trust</span>
+</div>
+<div class="h-1.5 w-full bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+<div class="h-full bg-green-500 rounded-full" style="width: 96%"></div>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between text-xs font-medium">
+<span class="text-gray-700 dark:text-gray-200">Local Blog X</span>
+<span class="text-amber-500">45% Trust</span>
+</div>
+<div class="h-1.5 w-full bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+<div class="h-full bg-amber-400 rounded-full" style="width: 45%"></div>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between text-xs font-medium">
+<span class="text-gray-700 dark:text-gray-200">User Generated</span>
+<span class="text-red-500">12% Trust</span>
+</div>
+<div class="h-1.5 w-full bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+<div class="h-full bg-red-500 rounded-full" style="width: 12%"></div>
+</div>
+</div>
+</div>
+<button class="w-full mt-5 py-2 text-xs font-bold text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800 rounded border border-dashed border-gray-300 dark:border-gray-700 transition-colors">
+                                View Full Index
+                            </button>
+</div>
+<!-- Cross Reference Widget -->
+<div class="bg-surface-light dark:bg-surface-dark rounded-lg border border-gray-200 dark:border-gray-800 p-5">
+<h3 class="text-sm font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary dark:text-white">hub</span>
+                                Cross-Reference
+                            </h3>
+<p class="text-xs text-gray-500 mb-3">Communities driving current discussions.</p>
+<div class="flex flex-wrap gap-2">
+<span class="inline-flex items-center gap-1 px-2 py-1 rounded bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 text-xs font-medium border border-blue-100 dark:border-blue-800">
+                                    r/politics <span class="text-[10px] opacity-70">12k</span>
+</span>
+<span class="inline-flex items-center gap-1 px-2 py-1 rounded bg-gray-50 dark:bg-gray-700/30 text-gray-700 dark:text-gray-300 text-xs font-medium border border-gray-200 dark:border-gray-700">
+                                    r/news <span class="text-[10px] opacity-70">8.5k</span>
+</span>
+<span class="inline-flex items-center gap-1 px-2 py-1 rounded bg-gray-50 dark:bg-gray-700/30 text-gray-700 dark:text-gray-300 text-xs font-medium border border-gray-200 dark:border-gray-700">
+                                    r/conservative <span class="text-[10px] opacity-70">5k</span>
+</span>
+<span class="inline-flex items-center gap-1 px-2 py-1 rounded bg-gray-50 dark:bg-gray-700/30 text-gray-700 dark:text-gray-300 text-xs font-medium border border-gray-200 dark:border-gray-700">
+                                    r/technology <span class="text-[10px] opacity-70">3k</span>
+</span>
+</div>
+<div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+<div class="bg-primary/5 p-3 rounded flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-sm mt-0.5">info</span>
+<p class="text-[11px] text-gray-600 dark:text-gray-400 leading-tight">
+                                        High overlap detected between <span class="font-bold">r/politics</span> and <span class="font-bold">r/news</span> on the "Tax Bill" topic.
+                                    </p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

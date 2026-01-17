@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tone &amp; Sentiment In-Depth Analysis - PoliticLens</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;family=Noto+Sans:wght@300..800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2280c3",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#121a20",
+                        "politic-cons": "#A32B2B", // Conservative Maroon
+                        "politic-lib": "#367099", // Liberal Steel Blue
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"],
+                        "body": ["Noto Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Manrope', sans-serif;
+        }
+        /* Custom scrollbar for data tables if needed */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-[#0f151a] dark:text-gray-100 flex flex-col min-h-screen overflow-x-hidden">
+<!-- Top Navigation -->
+<header class="sticky top-0 z-50 w-full bg-white dark:bg-[#1a2632] border-b border-[#e8eef2] dark:border-gray-700">
+<div class="px-6 md:px-10 py-3 flex items-center justify-between">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4 text-[#0f151a] dark:text-white">
+<div class="size-6 text-primary">
+<span class="material-symbols-outlined !text-[24px]">policy</span>
+</div>
+<h2 class="text-lg font-bold leading-tight tracking-[-0.015em]">PoliticLens</h2>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-[#537893] dark:text-gray-400 hover:text-primary text-sm font-medium transition-colors" href="#">Dashboard</a>
+<a class="text-primary text-sm font-bold" href="#">Analysis</a>
+<a class="text-[#537893] dark:text-gray-400 hover:text-primary text-sm font-medium transition-colors" href="#">Live Feed</a>
+<a class="text-[#537893] dark:text-gray-400 hover:text-primary text-sm font-medium transition-colors" href="#">Settings</a>
+</nav>
+</div>
+<div class="flex items-center gap-4 md:gap-6">
+<div class="relative hidden md:flex items-center">
+<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[#537893]">
+<span class="material-symbols-outlined !text-[20px]">search</span>
+</div>
+<input class="block w-full rounded-lg border-0 py-2 pl-10 text-gray-900 ring-1 ring-inset ring-gray-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 dark:bg-[#23303d] dark:ring-gray-700 dark:text-white" placeholder="Search topics..." type="text"/>
+</div>
+<button class="flex items-center justify-center size-10 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-[#0f151a] dark:text-white transition-colors">
+<span class="material-symbols-outlined !text-[24px]">notifications</span>
+</button>
+<div class="size-10 rounded-full bg-gray-200 bg-center bg-cover border border-gray-200" data-alt="User profile avatar" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAFu0MOxxmvRInS1BJPei_MK2irSpYUGQCDLLIdRAy-WROgo6vS1cqZyGcyZRW-DWWzm-XP3hCHb1DeICHXDEOPU6qyKyLiGWwWnlqZWx7hBY9W9OdyVMyFFyWvy67Ydsp-gDVwO0p_2JNDASi-338cnMrscG_5n4JkVQXZGVKiTOE71J4ndk1FCiPNYoPBG69WzBSXrDfujcQOzaHYw3omPii2TCnLe-dZiPNh0Ko5hZX7EvoFsiCZwvVPN2XO601lpd5SyYGC68A');"></div>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 w-full max-w-[1440px] mx-auto px-4 md:px-10 py-6">
+<!-- Breadcrumbs -->
+<div class="flex items-center gap-2 mb-6 text-sm">
+<a class="text-[#537893] dark:text-gray-400 hover:underline" href="#">Dashboard</a>
+<span class="text-[#537893] dark:text-gray-500">/</span>
+<a class="text-[#537893] dark:text-gray-400 hover:underline" href="#">Analysis</a>
+<span class="text-[#537893] dark:text-gray-500">/</span>
+<span class="text-[#0f151a] dark:text-gray-200 font-medium">Tone &amp; Sentiment</span>
+</div>
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-10 border-b border-[#e8eef2] dark:border-gray-800 pb-8">
+<div class="max-w-2xl">
+<h1 class="text-3xl md:text-4xl font-black text-[#0f151a] dark:text-white tracking-tight mb-3">Tone &amp; Sentiment In-Depth Analysis</h1>
+<p class="text-[#537893] dark:text-gray-400 text-lg leading-relaxed">
+                    Analyzing <span class="font-bold text-[#0f151a] dark:text-gray-200">12,403 comments</span> across major political subreddits over the last 7 days. Tracking rhetorical shifts and emotional density.
+                </p>
+</div>
+<div class="flex gap-3 shrink-0">
+<div class="flex items-center bg-white dark:bg-[#1a2632] border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 shadow-sm">
+<span class="material-symbols-outlined text-gray-400 mr-2 !text-[20px]">calendar_today</span>
+<span class="text-sm font-semibold text-[#0f151a] dark:text-white">Oct 14 - Oct 21</span>
+<span class="material-symbols-outlined text-gray-400 ml-2 !text-[20px]">arrow_drop_down</span>
+</div>
+<button class="flex items-center justify-center bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-sm transition-colors gap-2">
+<span class="material-symbols-outlined !text-[18px]">download</span>
+                    Export
+                </button>
+</div>
+</div>
+<!-- Stats Overview Row -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+<!-- Conservative Tone Score -->
+<div class="bg-white dark:bg-[#1a2632] rounded-lg p-5 border border-l-4 border-gray-200 dark:border-gray-700 border-l-politic-cons shadow-sm">
+<div class="flex justify-between items-start mb-2">
+<p class="text-[#537893] dark:text-gray-400 text-sm font-semibold uppercase tracking-wider">Conservative Tone</p>
+<span class="material-symbols-outlined text-politic-cons !text-[20px]">trending_up</span>
+</div>
+<div class="flex items-baseline gap-3">
+<p class="text-3xl font-bold text-[#0f151a] dark:text-white">+2.4</p>
+<span class="text-green-600 dark:text-green-400 text-sm font-medium bg-green-50 dark:bg-green-900/20 px-1.5 py-0.5 rounded">+0.5%</span>
+</div>
+<p class="text-xs text-[#537893] dark:text-gray-500 mt-2">Slightly more constructive than avg.</p>
+</div>
+<!-- Liberal Tone Score -->
+<div class="bg-white dark:bg-[#1a2632] rounded-lg p-5 border border-l-4 border-gray-200 dark:border-gray-700 border-l-politic-lib shadow-sm">
+<div class="flex justify-between items-start mb-2">
+<p class="text-[#537893] dark:text-gray-400 text-sm font-semibold uppercase tracking-wider">Liberal Tone</p>
+<span class="material-symbols-outlined text-politic-lib !text-[20px]">trending_down</span>
+</div>
+<div class="flex items-baseline gap-3">
+<p class="text-3xl font-bold text-[#0f151a] dark:text-white">-1.2</p>
+<span class="text-red-600 dark:text-red-400 text-sm font-medium bg-red-50 dark:bg-red-900/20 px-1.5 py-0.5 rounded">-2.1%</span>
+</div>
+<p class="text-xs text-[#537893] dark:text-gray-500 mt-2">More hostile than previous week.</p>
+</div>
+<!-- Constructive Ratio (C) -->
+<div class="bg-white dark:bg-[#1a2632] rounded-lg p-5 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden group">
+<div class="absolute right-0 top-0 w-24 h-24 bg-gradient-to-br from-politic-cons/10 to-transparent rounded-bl-full -mr-4 -mt-4"></div>
+<p class="text-[#537893] dark:text-gray-400 text-sm font-semibold uppercase tracking-wider mb-2 relative z-10">Constructive Ratio (C)</p>
+<div class="flex items-baseline gap-3 relative z-10">
+<p class="text-3xl font-bold text-[#0f151a] dark:text-white">65%</p>
+<span class="text-green-600 dark:text-green-400 text-sm font-medium">+5%</span>
+</div>
+<div class="w-full bg-gray-100 dark:bg-gray-800 h-1.5 rounded-full mt-4 overflow-hidden">
+<div class="bg-politic-cons h-full rounded-full" style="width: 65%"></div>
+</div>
+</div>
+<!-- Constructive Ratio (L) -->
+<div class="bg-white dark:bg-[#1a2632] rounded-lg p-5 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden group">
+<div class="absolute right-0 top-0 w-24 h-24 bg-gradient-to-br from-politic-lib/10 to-transparent rounded-bl-full -mr-4 -mt-4"></div>
+<p class="text-[#537893] dark:text-gray-400 text-sm font-semibold uppercase tracking-wider mb-2 relative z-10">Constructive Ratio (L)</p>
+<div class="flex items-baseline gap-3 relative z-10">
+<p class="text-3xl font-bold text-[#0f151a] dark:text-white">58%</p>
+<span class="text-red-600 dark:text-red-400 text-sm font-medium">-3%</span>
+</div>
+<div class="w-full bg-gray-100 dark:bg-gray-800 h-1.5 rounded-full mt-4 overflow-hidden">
+<div class="bg-politic-lib h-full rounded-full" style="width: 58%"></div>
+</div>
+</div>
+</div>
+<!-- Main Comparison Section -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+<!-- Comparison Charts (Left) -->
+<div class="lg:col-span-8 flex flex-col gap-6">
+<!-- Base Comparison Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Conservative Card -->
+<div class="bg-white dark:bg-[#1a2632] rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm p-6 flex flex-col h-full">
+<div class="flex items-center gap-3 mb-6">
+<div class="size-3 rounded-full bg-politic-cons"></div>
+<h3 class="font-bold text-lg text-[#0f151a] dark:text-white">Conservative Base</h3>
+</div>
+<div class="flex-1 flex flex-col justify-center mb-6">
+<div class="relative pt-6 pb-2">
+<div class="flex justify-between text-xs font-bold uppercase tracking-widest text-[#537893] dark:text-gray-500 mb-2">
+<span>Hostile</span>
+<span>Neutral</span>
+<span>Constructive</span>
+</div>
+<div class="h-4 bg-gray-100 dark:bg-gray-800 rounded-full w-full relative">
+<div class="absolute top-0 bottom-0 left-[20%] right-[15%] bg-politic-cons/20 rounded-full"></div>
+<div class="absolute top-1/2 -translate-y-1/2 left-[65%] w-3 h-3 bg-politic-cons rounded-full ring-4 ring-white dark:ring-[#1a2632] shadow-sm z-10"></div> <!-- Marker -->
+</div>
+<div class="mt-4 flex justify-between items-end">
+<div class="text-sm text-[#537893] dark:text-gray-400">Dominant Emotion: <span class="font-bold text-[#0f151a] dark:text-white">Cautious Optimism</span></div>
+<div class="text-2xl font-bold text-politic-cons">6.5<span class="text-sm text-gray-400 font-normal">/10</span></div>
+</div>
+</div>
+</div>
+<div class="pt-4 border-t border-gray-100 dark:border-gray-800">
+<p class="text-xs font-bold uppercase tracking-widest text-[#537893] dark:text-gray-500 mb-3">Defining Language</p>
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1 bg-politic-cons/10 text-politic-cons rounded-full text-xs font-bold border border-politic-cons/20">Constitution</span>
+<span class="px-3 py-1 bg-politic-cons/10 text-politic-cons rounded-full text-xs font-bold border border-politic-cons/20">Fiscal</span>
+<span class="px-3 py-1 bg-politic-cons/10 text-politic-cons rounded-full text-xs font-bold border border-politic-cons/20">Sovereignty</span>
+<span class="px-3 py-1 bg-politic-cons/10 text-politic-cons rounded-full text-xs font-bold border border-politic-cons/20">Border Security</span>
+<span class="px-3 py-1 bg-gray-100 text-gray-500 rounded-full text-xs font-bold dark:bg-gray-800 dark:text-gray-400">Inflation</span>
+</div>
+</div>
+</div>
+<!-- Liberal Card -->
+<div class="bg-white dark:bg-[#1a2632] rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm p-6 flex flex-col h-full">
+<div class="flex items-center gap-3 mb-6">
+<div class="size-3 rounded-full bg-politic-lib"></div>
+<h3 class="font-bold text-lg text-[#0f151a] dark:text-white">Liberal Base</h3>
+</div>
+<div class="flex-1 flex flex-col justify-center mb-6">
+<div class="relative pt-6 pb-2">
+<div class="flex justify-between text-xs font-bold uppercase tracking-widest text-[#537893] dark:text-gray-500 mb-2">
+<span>Hostile</span>
+<span>Neutral</span>
+<span>Constructive</span>
+</div>
+<div class="h-4 bg-gray-100 dark:bg-gray-800 rounded-full w-full relative">
+<div class="absolute top-0 bottom-0 left-[35%] right-[25%] bg-politic-lib/20 rounded-full"></div>
+<div class="absolute top-1/2 -translate-y-1/2 left-[40%] w-3 h-3 bg-politic-lib rounded-full ring-4 ring-white dark:ring-[#1a2632] shadow-sm z-10"></div> <!-- Marker -->
+</div>
+<div class="mt-4 flex justify-between items-end">
+<div class="text-sm text-[#537893] dark:text-gray-400">Dominant Emotion: <span class="font-bold text-[#0f151a] dark:text-white">Urgency</span></div>
+<div class="text-2xl font-bold text-politic-lib">4.0<span class="text-sm text-gray-400 font-normal">/10</span></div>
+</div>
+</div>
+</div>
+<div class="pt-4 border-t border-gray-100 dark:border-gray-800">
+<p class="text-xs font-bold uppercase tracking-widest text-[#537893] dark:text-gray-500 mb-3">Defining Language</p>
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1 bg-politic-lib/10 text-politic-lib rounded-full text-xs font-bold border border-politic-lib/20">Equity</span>
+<span class="px-3 py-1 bg-politic-lib/10 text-politic-lib rounded-full text-xs font-bold border border-politic-lib/20">Climate Action</span>
+<span class="px-3 py-1 bg-politic-lib/10 text-politic-lib rounded-full text-xs font-bold border border-politic-lib/20">Healthcare</span>
+<span class="px-3 py-1 bg-politic-lib/10 text-politic-lib rounded-full text-xs font-bold border border-politic-lib/20">Rights</span>
+<span class="px-3 py-1 bg-gray-100 text-gray-500 rounded-full text-xs font-bold dark:bg-gray-800 dark:text-gray-400">Housing</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Sentiment Over Time Chart -->
+<div class="bg-white dark:bg-[#1a2632] rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm p-6">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-bold text-lg text-[#0f151a] dark:text-white">Evolution of Discussion (Last 7 Days)</h3>
+<div class="flex items-center gap-4 text-xs font-medium">
+<div class="flex items-center gap-2 text-politic-cons">
+<div class="w-3 h-1 bg-politic-cons"></div>
+                                Conservative
+                            </div>
+<div class="flex items-center gap-2 text-politic-lib">
+<div class="w-3 h-1 bg-politic-lib"></div>
+                                Liberal
+                            </div>
+</div>
+</div>
+<!-- Mock Chart Container -->
+<div class="relative w-full h-[300px] border-l border-b border-gray-200 dark:border-gray-700">
+<!-- Y-Axis Grid Lines -->
+<div class="absolute inset-0 flex flex-col justify-between pointer-events-none text-xs text-gray-400">
+<div class="w-full h-px bg-gray-100 dark:bg-gray-800 relative"><span class="absolute -left-8 -top-2">10</span></div>
+<div class="w-full h-px bg-gray-100 dark:bg-gray-800 relative"><span class="absolute -left-8 -top-2">5</span></div>
+<div class="w-full h-px bg-gray-100 dark:bg-gray-800 relative"><span class="absolute -left-8 -top-2">0</span></div>
+<div class="w-full h-px bg-gray-100 dark:bg-gray-800 relative"><span class="absolute -left-8 -top-2">-5</span></div>
+<div class="w-full h-px bg-gray-100 dark:bg-gray-800 relative"><span class="absolute -left-8 -top-2">-10</span></div>
+</div>
+<!-- Event Flags -->
+<div class="absolute top-[20%] left-[30%] h-[80%] w-px border-l border-dashed border-gray-300 dark:border-gray-600 group cursor-pointer z-10">
+<div class="absolute -top-6 -left-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 px-2 py-1 rounded text-[10px] shadow-sm whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">Debate Night</div>
+<div class="size-2 bg-gray-400 rounded-full absolute -top-1 -left-[3.5px]"></div>
+</div>
+<!-- Data Visualization SVG -->
+<svg class="absolute inset-0 w-full h-full overflow-visible" preserveaspectratio="none">
+<!-- Conservative Line -->
+<path class="drop-shadow-sm" d="M0,150 C50,140 100,100 150,80 C200,60 250,160 300,140 C350,120 400,90 450,110 C500,130 550,100 600,80 C650,60 700,50 750,60" fill="none" stroke="#A32B2B" stroke-width="2.5" vector-effect="non-scaling-stroke"></path>
+<!-- Liberal Line -->
+<path class="drop-shadow-sm" d="M0,180 C50,190 100,220 150,240 C200,260 250,200 300,210 C350,220 400,250 450,230 C500,210 550,180 600,190 C650,200 700,170 750,160" fill="none" stroke="#367099" stroke-width="2.5" vector-effect="non-scaling-stroke"></path>
+</svg>
+<!-- X-Axis Labels -->
+<div class="absolute -bottom-6 w-full flex justify-between text-xs text-gray-400 font-medium">
+<span>Oct 14</span>
+<span>Oct 15</span>
+<span>Oct 16</span>
+<span>Oct 17</span>
+<span>Oct 18</span>
+<span>Oct 19</span>
+<span>Oct 20</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Side Panel (Insights) -->
+<div class="lg:col-span-4 flex flex-col gap-6">
+<!-- AI Summary Card -->
+<div class="bg-[#F4F6F8] dark:bg-[#1f2d38] rounded-lg p-6 border border-gray-200 dark:border-gray-700 h-full">
+<div class="flex items-center gap-2 mb-4 text-primary">
+<span class="material-symbols-outlined !text-[20px]">auto_awesome</span>
+<h4 class="font-bold text-sm uppercase tracking-wider">Key Takeaways</h4>
+</div>
+<div class="space-y-6">
+<div class="relative pl-4 border-l-2 border-politic-cons">
+<p class="text-xs font-bold text-politic-cons mb-1">CONSERVATIVE SHIFT</p>
+<p class="text-sm text-[#0f151a] dark:text-gray-300 leading-relaxed">
+                                Sentiment spiked towards "Constructive" on Oct 16th following the fiscal policy announcement. Usage of "Freedom" increased by 45%.
+                            </p>
+</div>
+<div class="relative pl-4 border-l-2 border-politic-lib">
+<p class="text-xs font-bold text-politic-lib mb-1">LIBERAL REACTION</p>
+<p class="text-sm text-[#0f151a] dark:text-gray-300 leading-relaxed">
+                                A dip in sentiment scores correlates with debate threads. "Urgency" and "Crisis" became dominant keywords, driving the score down to -2.1.
+                            </p>
+</div>
+<div class="relative pl-4 border-l-2 border-gray-400">
+<p class="text-xs font-bold text-gray-500 mb-1">COMMON GROUND</p>
+<p class="text-sm text-[#0f151a] dark:text-gray-300 leading-relaxed">
+                                Surprisingly, both bases showed converging positive sentiment around "Infrastructure" threads on Sunday, suggesting a bipartisan topic of interest.
+                            </p>
+</div>
+</div>
+<div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+<h5 class="font-bold text-sm text-[#0f151a] dark:text-white mb-3">Top Shared Topics</h5>
+<div class="flex flex-col gap-2">
+<div class="flex justify-between items-center text-sm">
+<span class="text-gray-600 dark:text-gray-400">Infrastructure Bill</span>
+<span class="font-bold text-gray-800 dark:text-gray-200">2.1k mentions</span>
+</div>
+<div class="w-full bg-gray-200 dark:bg-gray-700 h-1.5 rounded-full">
+<div class="bg-gray-500 h-full rounded-full" style="width: 80%"></div>
+</div>
+<div class="flex justify-between items-center text-sm mt-2">
+<span class="text-gray-600 dark:text-gray-400">Election Security</span>
+<span class="font-bold text-gray-800 dark:text-gray-200">1.4k mentions</span>
+</div>
+<div class="w-full bg-gray-200 dark:bg-gray-700 h-1.5 rounded-full">
+<div class="bg-gray-500 h-full rounded-full" style="width: 55%"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Detailed Breakdown Grid (Additional Data) -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+<div class="bg-white dark:bg-[#1a2632] rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm p-6">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-bold text-[#0f151a] dark:text-white">Engagement Distribution</h3>
+<button class="text-primary text-sm font-semibold">View Details</button>
+</div>
+<div class="flex items-center justify-center py-6">
+<div class="w-full h-48 bg-[url('https://placehold.co/600x200/F6F7F8/CBD5E1?text=Data+Visualization+Map')] bg-cover bg-center rounded-lg relative overflow-hidden group" data-alt="Abstract heatmap visualization of engagement across different political subreddits">
+<div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:translate-x-full duration-1000 transition-transform"></div>
+<div class="flex items-center justify-center h-full text-gray-400 font-medium text-sm">
+                            Detailed Heatmap Loading...
+                         </div>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-[#1a2632] rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm p-6">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-bold text-[#0f151a] dark:text-white">Sentiment Velocity</h3>
+<span class="material-symbols-outlined text-gray-400 !text-[20px]">info</span>
+</div>
+<p class="text-sm text-gray-500 dark:text-gray-400 mb-6">How quickly the conversation tone changes after a breaking news event.</p>
+<div class="space-y-4">
+<div class="flex items-center gap-4">
+<span class="text-xs font-bold text-politic-cons w-16 text-right">CONS</span>
+<div class="flex-1 bg-gray-100 dark:bg-gray-800 h-2 rounded-full overflow-hidden">
+<div class="h-full bg-politic-cons w-[72%] rounded-full"></div>
+</div>
+<span class="text-xs font-bold text-gray-600 dark:text-gray-400 w-12">High</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-xs font-bold text-politic-lib w-16 text-right">LIB</span>
+<div class="flex-1 bg-gray-100 dark:bg-gray-800 h-2 rounded-full overflow-hidden">
+<div class="h-full bg-politic-lib w-[88%] rounded-full"></div>
+</div>
+<span class="text-xs font-bold text-gray-600 dark:text-gray-400 w-12">V. High</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>
