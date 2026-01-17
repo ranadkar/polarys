@@ -45,7 +45,7 @@ const Landing = () => {
                 </div>
                 <div className={styles.dataSource}>
                   <span className="material-symbols-outlined">database</span>
-                  <span>Reddit / Twitter / Reuters</span>
+                  <span>Reddit / Twitter / NewsAPI</span>
                 </div>
                 <div className={styles.nodeTags}>
                   <span className={styles.nodeTagBlue}>LIB_NODES</span>
@@ -67,16 +67,16 @@ const Landing = () => {
                 </div>
                 <h2 className={styles.sectionTitle}>Liberal Narrative Analysis</h2>
                 <p className={styles.sectionDescription}>
-                  Our algorithm maps the semantic density of Liberal Reddit clusters. We isolate specific value-anchors—such as systemic equity and collective welfare—that define the core arguments within these information silos.
+                  Our algorithm maps the semantic density of Liberal discourse across Reddit, Twitter, and major news outlets. We isolate specific value-anchors—such as systemic equity and collective welfare—that define the core arguments within these information silos.
                 </p>
                 <div className={styles.featureCards}>
                   <div className={`${styles.featureCard} ${styles.featureCardBlue}`}>
                     <h4 className={styles.featureCardTitle}>Signal Identification</h4>
-                    <p className={styles.featureCardDesc}>Identifying cross-citation patterns between high-authority liberal news sources and community influencers.</p>
+                    <p className={styles.featureCardDesc}>Identifying cross-citation patterns across Reddit threads, Twitter conversations, and news articles.</p>
                   </div>
                   <div className={`${styles.featureCard} ${styles.featureCardBlue}`}>
                     <h4 className={styles.featureCardTitle}>Sentiment Variance</h4>
-                    <p className={styles.featureCardDesc}>Measuring the internal consistency of liberal discourse across geography and demographic sub-clusters.</p>
+                    <p className={styles.featureCardDesc}>Measuring the internal consistency of discourse across social media platforms and news coverage.</p>
                   </div>
                 </div>
               </div>
@@ -161,16 +161,16 @@ const Landing = () => {
                 </div>
                 <h2 className={styles.sectionTitle}>Conservative Reality Anchors</h2>
                 <p className={styles.sectionDescription}>
-                  We analyze Conservative nodes to detect high-relevance topics like institutional trust and fiscal heritage. Our tools filter through the reactionary noise to map the underlying policy frameworks.
+                  We analyze Conservative discourse across Reddit, Twitter, and news channels to detect high-relevance topics like institutional trust and fiscal heritage. Our tools filter through the noise to map the underlying policy frameworks.
                 </p>
                 <div className={styles.featureCards}>
                   <div className={`${styles.featureCard} ${styles.featureCardRed}`}>
                     <h4 className={styles.featureCardTitle}>Citation Verification</h4>
-                    <p className={styles.featureCardDesc}>Tracing primary source usage within conservative networks to distinguish grassroots sentiment from state-sponsored influence.</p>
+                    <p className={styles.featureCardDesc}>Tracing primary source usage across Reddit, Twitter, and news outlets to distinguish grassroots sentiment from coordinated messaging.</p>
                   </div>
                   <div className={`${styles.featureCard} ${styles.featureCardRed}`}>
                     <h4 className={styles.featureCardTitle}>Thematic Stability</h4>
-                    <p className={styles.featureCardDesc}>Tracking the lifecycle of specific policy arguments from niche forums to mainstream media outlets.</p>
+                    <p className={styles.featureCardDesc}>Tracking the lifecycle of specific policy arguments from social media discussions to mainstream news coverage.</p>
                   </div>
                 </div>
               </div>
@@ -219,10 +219,10 @@ const Landing = () => {
                 <p className={styles.sectionDescription}>
                   Pulse acts as a citation-backed buffer. We don't just "flag" content; we provide an immediate, verifiable record from non-partisan sources like the CBO, BLS, and academic archives.
                 </p>
-                <button className={styles.viewProtocolButton}>
+                {/* <button className={styles.viewProtocolButton}>
                   View Verification Protocol
                   <span className="material-symbols-outlined">arrow_right_alt</span>
-                </button>
+                </button> */}
               </div>
             </div>
           </div>
