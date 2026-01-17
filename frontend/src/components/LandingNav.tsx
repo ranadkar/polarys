@@ -12,9 +12,10 @@ const LandingNav = () => {
                     <span className={styles.logoText}>Pulse.</span>
                 </div>
                 <nav className={styles.nav}>
-                    <a className={styles.navLink} href="#methodology">How it Works</a>
-                    <a className={styles.navLink} href="#challenge">The Challenge</a>
                     <a className={styles.navLink} href="#methodology">Methodology</a>
+                    <a className={styles.navLink} href="#conservative">Viewpoints</a>
+                    <a className={styles.navLink} href="#challenge">Verification</a>
+                    <a className={styles.navLink} href="#synthesis">Synthesis</a>
                 </nav>
                 <div className={styles.actions}>
                     <ThemeToggle />

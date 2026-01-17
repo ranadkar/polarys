@@ -205,7 +205,7 @@ const Landing = () => {
 
         {/* Challenge/Verification Section */}
         <section className={styles.challengeSection} id="challenge">
-          <div className={styles.sectionContainer}>
+          <div className={`${styles.sectionContainer} ${styles.challengeSectionContainer}`}>
             <div className={styles.sectionGrid}>
               <div>
                 <div className={styles.challengeCard}>
@@ -254,7 +254,7 @@ const Landing = () => {
         </section>
 
         {/* Synthesis Section */}
-        <section className={styles.synthesisSection}>
+        <section className={styles.synthesisSection} id="synthesis">
           <div className={styles.synthesisGridBg}></div>
           <div className={styles.synthesisContainer}>
             <div className={styles.synthesisHeader}>

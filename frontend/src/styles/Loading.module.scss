@@ -9,9 +9,11 @@ $editorial-blue: #3B82F6;
 $editorial-red: #EF4444;
 
 .loading {
+    overflow: hidden;
     font-family: 'Manrope', sans-serif;
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
+    max-height: 100vh;
     background-color: $charcoal;
     color: white;
     display: flex;
@@ -64,6 +66,7 @@ $editorial-red: #EF4444;
 
 // Main content container
 .content {
+
     position: relative;
     z-index: 10;
     display: flex;
