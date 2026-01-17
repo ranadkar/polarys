@@ -3,7 +3,13 @@ from fastapi import FastAPI
 from search import search_news
 from scrapers.cnn import fetch_cnn
 from scrapers.fox import fetch_fox
+from google import genai
+from dotenv import load_dotenv
 
+load_dotenv()
+
+
+client = genai.Client()
 app = FastAPI()
 
 

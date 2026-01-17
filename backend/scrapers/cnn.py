@@ -26,4 +26,3 @@ if __name__ == "__main__":
             "https://www.cnn.com/2026/01/05/politics/tim-walz-minnesota-reelection"
         )
     )
-
