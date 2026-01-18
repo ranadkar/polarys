@@ -1,57 +1,48 @@
+"""FastAPI server for News Sentiment and Bias Analysis API."""
 import asyncio
-import os
-import re
-import uuid
-import uvicorn
-from datetime import datetime
-
+from contextlib import asynccontextmanager
 import asyncpraw
-from dotenv import load_dotenv
 from fastapi import FastAPI, Body, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from openai import OpenAI
-from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-
-from reddit_sentiment import search_reddit
-from bluesky import search_bluesky
-from scrapers.cnn import fetch_cnn
-from scrapers.fox import fetch_fox
-from scrapers.cbs import fetch_cbs
-from scrapers.nbc import fetch_nbc
-from scrapers.abc import fetch_abc
-from scrapers.breitbart import fetch_breitbart
-from scrapers.nypost import fetch_nypost
-from scrapers.oann import fetch_oann
-from search_news import search_news
 from atproto import AsyncClient
 
-load_dotenv()
+from config import (
+    REDDIT_CLIENT_ID,
+    REDDIT_CLIENT_SECRET,
+    REDDIT_USER_AGENT,
+    BLUESKY_HANDLE,
+    BLUESKY_APP_PASSWORD,
+    OUTLETS,
+    NEWS_DOMAINS,
+    MAX_LEFT_ARTICLES,
+    MAX_RIGHT_ARTICLES,
+    MAX_TOTAL_ARTICLES,
+    MIN_CONTENT_LENGTH,
+)
+from database import (
+    init_db,
+    close_db,
+    create_session,
+    session_exists,
+    store_articles_batch,
+    get_article,
+)
+from sentiment import analyze_sentiment, classify_bias, generate_summary, generate_insights
+from utils import strip_html_tags, to_epoch_time
+from search import search_news, search_reddit, search_bluesky
 
 
-def strip_html_tags(text: str) -> str:
-    """Remove HTML tags from text."""
-    if not text:
-        return text
-    # Remove HTML tags
-    clean_text = re.sub(r"<[^>]+>", "", text)
-    # Normalize all whitespace (spaces, newlines, tabs, etc.) to single spaces
-    clean_text = re.sub(r"\s+", " ", clean_text)
-    # Clean up extra whitespace at start/end
-    clean_text = clean_text.strip()
-    return clean_text
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Lifespan event handler for startup and shutdown."""
+    # Startup
+    await init_db()
+    yield
+    # Shutdown
+    await close_db()
 
 
-def to_epoch_time(iso_timestamp: str) -> int:
-    """Convert ISO 8601 UTC timestamp to epoch time."""
-    if not iso_timestamp:
-        return 0
-    # Parse ISO 8601 format like "2026-01-16T22:36:55Z"
-    dt = datetime.fromisoformat(iso_timestamp.replace("Z", "+00:00"))
-    return int(dt.timestamp())
-
-
-client = OpenAI()
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -61,80 +52,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Initialize Reddit client
 reddit = asyncpraw.Reddit(
-    client_id=os.getenv("REDDIT_CLIENT_ID"),
-    client_secret=os.getenv("REDDIT_CLIENT_SECRET"),
-    user_agent=os.getenv("REDDIT_USER_AGENT"),
+    client_id=REDDIT_CLIENT_ID,
+    client_secret=REDDIT_CLIENT_SECRET,
+    user_agent=REDDIT_USER_AGENT,
 )
 
+# Initialize Bluesky client
 bluesky_client = AsyncClient()
 bluesky_logged_in = False
 
-sentiment_analyzer = SentimentIntensityAnalyzer()
-
-# Global storage for sessions keyed by session_id
-# Each session contains articles_by_url dict
-sessions = {}
-
 # Global cache for scraped full content
 scraped_content_cache = {}
-
-# Outlet configuration mapping
-OUTLETS = {
-    "cnn.com": {"source": "CNN", "bias": "left", "scraper": fetch_cnn},
-    "cbsnews.com": {"source": "CBS News", "bias": "left", "scraper": fetch_cbs},
-    "nbcnews.com": {"source": "NBC News", "bias": "left", "scraper": fetch_nbc},
-    "abcnews.go.com": {"source": "ABC News", "bias": "left", "scraper": fetch_abc},
-    "foxnews.com": {"source": "Fox News", "bias": "right", "scraper": fetch_fox},
-    "breitbart.com": {
-        "source": "Breitbart",
-        "bias": "right",
-        "scraper": fetch_breitbart,
-    },
-    "nypost.com": {"source": "NY Post", "bias": "right", "scraper": fetch_nypost},
-    "oann.com": {"source": "OANN", "bias": "right", "scraper": fetch_oann},
-}
-
-
-def analyze_sentiment(title: str, content: str) -> tuple[str, float]:
-    """Analyze sentiment of text and return category and score."""
-    text_content = title + " " + (content or "")
-    sentiment_scores = sentiment_analyzer.polarity_scores(text_content)
-    compound_score = sentiment_scores["compound"]
-
-    sentiment_category = (
-        "positive"
-        if compound_score >= 0.05
-        else "negative"
-        if compound_score <= -0.05
-        else "neutral"
-    )
-
-    return sentiment_category, compound_score
-
-
-async def classify_bias(title: str, content: str, subreddit: str = "") -> str:
-    """Use OpenAI to classify political bias of a post as 'left' or 'right'."""
-    try:
-        subreddit_info = f"\nSubreddit: r/{subreddit}" if subreddit else ""
-        prompt = f"""Analyze the political bias of this social media post. Classify it as either 'left' (liberal/progressive) or 'right' (conservative).
-
-Title: {title}
-Content: {content[:500]}{subreddit_info}
-
-Respond with ONLY one word: either 'left' or 'right'."""
-
-        response = await asyncio.to_thread(
-            client.chat.completions.create,
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}],
-        )
-
-        bias = response.choices[0].message.content.strip().lower()
-        return bias if bias in ["left", "right"] else "left"
-    except Exception as e:
-        print(f"Error classifying bias: {e}")
-        return "left"
 
 
 @app.get("/")
@@ -147,23 +77,17 @@ async def search(q: str):
     global bluesky_logged_in
 
     # Generate a new session ID for this search
-    session_id = str(uuid.uuid4())
-    sessions[session_id] = {}
+    session_id = await create_session()
+    articles_to_store = []
 
     # Login to Bluesky if not already logged in
     if not bluesky_logged_in:
-        await bluesky_client.login(
-            os.getenv("BLUESKY_HANDLE"), os.getenv("BLUESKY_APP_PASSWORD")
-        )
+        await bluesky_client.login(BLUESKY_HANDLE, BLUESKY_APP_PASSWORD)
         bluesky_logged_in = True
 
     # Run news search, Reddit search, and Bluesky search in parallel
     news_task = asyncio.create_task(
-        asyncio.to_thread(
-            search_news,
-            q,
-            "cnn.com, cbsnews.com, nbcnews.com, abcnews.go.com, foxnews.com, breitbart.com, nypost.com, oann.com",
-        )
+        asyncio.to_thread(search_news, q, NEWS_DOMAINS)
     )
     reddit_task = asyncio.create_task(search_reddit(reddit, q, "all", limit=20))
     bluesky_task = asyncio.create_task(
@@ -181,7 +105,7 @@ async def search(q: str):
     right_count = 0
 
     for article in results:
-        if len(outputs) >= 50:
+        if len(outputs) >= MAX_TOTAL_ARTICLES:
             break
 
         # Find matching outlet
@@ -191,9 +115,9 @@ async def search(q: str):
         if not outlet_info:
             continue
 
-        # Filter out articles with less than 100 characters of content
+        # Filter out articles with less than minimum content length
         clean_content = strip_html_tags(article["content"])
-        if len(clean_content) < 100:
+        if len(clean_content) < MIN_CONTENT_LENGTH:
             continue
 
         bias = outlet_info["bias"]
@@ -201,11 +125,11 @@ async def search(q: str):
 
         # Check if we've hit the limit for this bias type
         if bias == "left":
-            if left_count >= 20:
+            if left_count >= MAX_LEFT_ARTICLES:
                 continue
             left_count += 1
         else:  # right
-            if right_count >= 20:
+            if right_count >= MAX_RIGHT_ARTICLES:
                 continue
             right_count += 1
 
@@ -223,7 +147,7 @@ async def search(q: str):
             "date": to_epoch_time(article["publishedAt"]),
         }
         outputs.append(output)
-        sessions[session_id][article["url"]] = output
+        articles_to_store.append((article["url"], output))
 
     # Analyze sentiment and classify bias for Reddit posts
     bias_tasks = [
@@ -243,9 +167,9 @@ async def search(q: str):
         post["sentiment"] = sentiment
         post["sentiment_score"] = sentiment_score
         outputs.append(post)
-        sessions[session_id][post["url"]] = post
+        articles_to_store.append((post["url"], post))
 
-    # Process Bluesky posts (now returns list directly like Reddit)
+    # Process Bluesky posts
     bluesky_posts = bluesky_result if bluesky_result else []
 
     # Analyze sentiment and classify bias for Bluesky posts
@@ -264,7 +188,10 @@ async def search(q: str):
         post["sentiment"] = sentiment
         post["sentiment_score"] = sentiment_score
         outputs.append(post)
-        sessions[session_id][post["url"]] = post
+        articles_to_store.append((post["url"], post))
+
+    # Store all articles in the database
+    await store_articles_batch(session_id, articles_to_store)
 
     return {"session_id": session_id, "results": outputs}
 
@@ -273,17 +200,21 @@ async def search(q: str):
 async def summary(url: str, session_id: str):
     """Generate a summary for a given article URL."""
     # Check if the session exists
-    if session_id not in sessions:
-        raise HTTPException(status_code=404, detail="Session not found. Please search for content first.")
-
-    articles_by_url = sessions[session_id]
+    if not await session_exists(session_id):
+        raise HTTPException(
+            status_code=404, detail="Session not found. Please search for content first."
+        )
 
     # Check if the URL exists in our session
-    if url not in articles_by_url:
-        raise HTTPException(status_code=404, detail="URL not found in this session. Please search for content first.")
+    article = await get_article(session_id, url)
+    if not article:
+        raise HTTPException(
+            status_code=404,
+            detail="URL not found in this session. Please search for content first.",
+        )
 
-    article = articles_by_url[url]
     source = article.get("source", "")
+    content_to_summarize = article.get("contents", "")
 
     # Determine if this is a news article that needs scraping
     if source in [
@@ -317,32 +248,11 @@ async def summary(url: str, session_id: str):
                     print(f"Error scraping {url}: {e}")
                     # Fallback to existing content
                     content_to_summarize = article.get("contents", "")
-            else:
-                content_to_summarize = article.get("contents", "")
-    else:
-        # Reddit or Bluesky - use existing content
-        content_to_summarize = article.get("contents", "")
 
     # Generate summary using OpenAI
     try:
         title = article.get("title", "")
-        prompt = f"""Provide a concise summary (3-5 sentences) of the following article. The summary MUST be in English, regardless of the original language.
-
-Title: {title}
-
-Content:
-{content_to_summarize[:3000]}
-
-Summary (in English):"""
-
-        response = await asyncio.to_thread(
-            client.chat.completions.create,
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}],
-        )
-
-        summary_text = response.choices[0].message.content.strip()
-
+        summary_text = await generate_summary(title, content_to_summarize)
         return {"url": url, "title": title, "source": source, "summary": summary_text}
     except Exception as e:
         print(f"Error generating summary: {e}")
@@ -366,10 +276,10 @@ async def insights(session_id: str = Body(...), articles: list[dict] = Body(...)
         }
     """
     # Check if the session exists
-    if session_id not in sessions:
-        raise HTTPException(status_code=404, detail="Session not found. Please search for content first.")
-
-    articles_by_url = sessions[session_id]
+    if not await session_exists(session_id):
+        raise HTTPException(
+            status_code=404, detail="Session not found. Please search for content first."
+        )
 
     # Separate articles by bias
     left_articles = []
@@ -379,13 +289,14 @@ async def insights(session_id: str = Body(...), articles: list[dict] = Body(...)
         url = item.get("url")
         bias = item.get("bias")
 
-        if url not in articles_by_url:
+        article = await get_article(session_id, url)
+        if not article:
             continue
-
-        article = articles_by_url[url]
 
         # Get full content if it's a news article
         source = article.get("source", "")
+        content = article.get("contents", "")
+
         if source in [
             "CNN",
             "CBS News",
@@ -413,11 +324,6 @@ async def insights(session_id: str = Body(...), articles: list[dict] = Body(...)
                         content = full_content
                     except Exception as e:
                         print(f"Error scraping {url}: {e}")
-                        content = article.get("contents", "")
-                else:
-                    content = article.get("contents", "")
-        else:
-            content = article.get("contents", "")
 
         article_data = {
             "title": article.get("title", ""),
@@ -441,36 +347,7 @@ async def insights(session_id: str = Body(...), articles: list[dict] = Body(...)
 
     # Generate insights using OpenAI
     try:
-        prompt = f"""Analyze the following articles from different political perspectives and provide insights.
-
-LEFT-LEANING ARTICLES:
-{left_context[:8000]}
-
-RIGHT-LEANING ARTICLES:
-{right_context[:8000]}
-
-Provide three things:
-1. key_takeaway_left: A 2-3 sentence key insight or takeaway from the left-leaning perspective
-2. key_takeaway_right: A 2-3 sentence key insight or takeaway from the right-leaning perspective
-3. common_ground: An array of EXACTLY 3 objects, each with:
-   - "title": A short 2-4 word title for the common ground area (e.g., "Infrastructure Modernization", "Data Privacy Rights", "Energy Security")
-   - "bullet_point": A complete sentence describing the common ground or shared concern in that area
-
-Format your response as JSON with these three keys: key_takeaway_left (string), key_takeaway_right (string), common_ground (array of 3 objects with title and bullet_point)"""
-
-        response = await asyncio.to_thread(
-            client.chat.completions.create,
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}],
-            response_format={"type": "json_object"},
-        )
-
-        insights_text = response.choices[0].message.content.strip()
-
-        # Parse the JSON response
-        import json
-
-        insights_data = json.loads(insights_text)
+        insights_data = await generate_insights(left_context, right_context)
 
         return {
             "key_takeaway_left": insights_data.get("key_takeaway_left", ""),
@@ -483,4 +360,5 @@ Format your response as JSON with these three keys: key_takeaway_left (string), 
 
 
 if __name__ == "__main__":
-    uvicorn.run("server:app")
+    import uvicorn
+    uvicorn.run("server:app", host="0.0.0.0", port=8000)
