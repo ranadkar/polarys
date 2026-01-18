@@ -6,7 +6,7 @@ from datetime import datetime
 
 import asyncpraw
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, Body
 from fastapi.middleware.cors import CORSMiddleware
 from openai import OpenAI
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
@@ -74,6 +74,9 @@ sentiment_analyzer = SentimentIntensityAnalyzer()
 # Global storage for articles keyed by URL
 articles_by_url = {}
 
+# Global cache for scraped full content
+scraped_content_cache = {}
+
 # Outlet configuration mapping
 OUTLETS = {
     "cnn.com": {"source": "CNN", "bias": "left", "scraper": fetch_cnn},
@@ -130,7 +133,7 @@ Respond with ONLY one word: either 'left' or 'right'."""
 
 @app.get("/")
 async def root():
-    return {"message": "goon"}
+    return {"message": "Welcome to the News Sentiment and Bias Analysis API"}
 
 
 @app.get("/search")
@@ -178,6 +181,11 @@ async def search(q: str):
         if not outlet_info:
             continue
 
+        # Filter out articles with less than 100 characters of content
+        clean_content = strip_html_tags(article["content"])
+        if len(clean_content) < 100:
+            continue
+
         bias = outlet_info["bias"]
         source = outlet_info["source"]
 
@@ -192,14 +200,14 @@ async def search(q: str):
             right_count += 1
 
         sentiment, sentiment_score = analyze_sentiment(
-            article["title"], strip_html_tags(article["content"])
+            article["title"], clean_content
         )
 
         output = {
             "source": source,
             "title": article["title"],
             "url": article["url"],
-            "contents": strip_html_tags(article["content"]),
+            "contents": clean_content,
             "bias": bias,
             "sentiment": sentiment,
             "sentiment_score": sentiment_score,
@@ -265,24 +273,29 @@ async def summary(url: str):
     
     # Determine if this is a news article that needs scraping
     if source in ["CNN", "CBS News", "NBC News", "ABC News", "Fox News", "Breitbart", "NY Post", "OANN"]:
-        # Find the appropriate scraper
-        scraper = None
-        for domain, info in OUTLETS.items():
-            if domain in url:
-                scraper = info.get("scraper")
-                break
-        
-        if scraper:
-            try:
-                # Scrape the full content
-                full_content = await asyncio.to_thread(scraper, url)
-                content_to_summarize = full_content
-            except Exception as e:
-                print(f"Error scraping {url}: {e}")
-                # Fallback to existing content
-                content_to_summarize = article.get("contents", "")
+        # Check cache first
+        if url in scraped_content_cache:
+            content_to_summarize = scraped_content_cache[url]
         else:
-            content_to_summarize = article.get("contents", "")
+            # Find the appropriate scraper
+            scraper = None
+            for domain, info in OUTLETS.items():
+                if domain in url:
+                    scraper = info.get("scraper")
+                    break
+            
+            if scraper:
+                try:
+                    # Scrape the full content
+                    full_content = await asyncio.to_thread(scraper, url)
+                    scraped_content_cache[url] = full_content
+                    content_to_summarize = full_content
+                except Exception as e:
+                    print(f"Error scraping {url}: {e}")
+                    # Fallback to existing content
+                    content_to_summarize = article.get("contents", "")
+            else:
+                content_to_summarize = article.get("contents", "")
     else:
         # Reddit or Bluesky - use existing content
         content_to_summarize = article.get("contents", "")
@@ -316,6 +329,122 @@ Summary (in English):"""
     except Exception as e:
         print(f"Error generating summary: {e}")
         return {"error": f"Failed to generate summary: {str(e)}"}
+
+
+@app.post("/insights")
+async def insights(articles: list[dict] = Body(...)):
+    """
+    Generate key takeaways for left and right perspectives, plus common ground.
+    
+    Args:
+        articles: List of dicts with 'url' and 'bias' keys
+    
+    Returns:
+        {
+            "key_takeaway_left": str,
+            "key_takeaway_right": str,
+            "common_ground": str
+        }
+    """
+    # Separate articles by bias
+    left_articles = []
+    right_articles = []
+    
+    for item in articles:
+        url = item.get("url")
+        bias = item.get("bias")
+        
+        if url not in articles_by_url:
+            continue
+        
+        article = articles_by_url[url]
+        
+        # Get full content if it's a news article
+        source = article.get("source", "")
+        if source in ["CNN", "CBS News", "NBC News", "ABC News", "Fox News", "Breitbart", "NY Post", "OANN"]:
+            # Check cache first
+            if url in scraped_content_cache:
+                content = scraped_content_cache[url]
+            else:
+                scraper = None
+                for domain, info in OUTLETS.items():
+                    if domain in url:
+                        scraper = info.get("scraper")
+                        break
+                
+                if scraper:
+                    try:
+                        full_content = await asyncio.to_thread(scraper, url)
+                        scraped_content_cache[url] = full_content
+                        content = full_content
+                    except Exception as e:
+                        print(f"Error scraping {url}: {e}")
+                        content = article.get("contents", "")
+                else:
+                    content = article.get("contents", "")
+        else:
+            content = article.get("contents", "")
+        
+        article_data = {
+            "title": article.get("title", ""),
+            "source": source,
+            "content": content[:2000]  # Limit content length
+        }
+        
+        if bias == "left":
+            left_articles.append(article_data)
+        elif bias == "right":
+            right_articles.append(article_data)
+    
+    # Build context strings
+    left_context = "\n\n".join([
+        f"[{a['source']}] {a['title']}\n{a['content']}"
+        for a in left_articles
+    ])
+    
+    right_context = "\n\n".join([
+        f"[{a['source']}] {a['title']}\n{a['content']}"
+        for a in right_articles
+    ])
+    
+    # Generate insights using OpenAI
+    try:
+        prompt = f"""Analyze the following articles from different political perspectives and provide insights.
+
+LEFT-LEANING ARTICLES:
+{left_context[:8000]}
+
+RIGHT-LEANING ARTICLES:
+{right_context[:8000]}
+
+Provide three things:
+1. key_takeaway_left: A 2-3 sentence key insight or takeaway from the left-leaning perspective
+2. key_takeaway_right: A 2-3 sentence key insight or takeaway from the right-leaning perspective
+3. common_ground: A 2-3 sentence insight about common ground or shared concerns between both perspectives, showing how they're sometimes not so different
+
+Format your response as JSON with these three keys: key_takeaway_left, key_takeaway_right, common_ground"""
+
+        response = await asyncio.to_thread(
+            client.chat.completions.create,
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+            response_format={"type": "json_object"}
+        )
+
+        insights_text = response.choices[0].message.content.strip()
+        
+        # Parse the JSON response
+        import json
+        insights_data = json.loads(insights_text)
+        
+        return {
+            "key_takeaway_left": insights_data.get("key_takeaway_left", ""),
+            "key_takeaway_right": insights_data.get("key_takeaway_right", ""),
+            "common_ground": insights_data.get("common_ground", "")
+        }
+    except Exception as e:
+        print(f"Error generating insights: {e}")
+        return {"error": f"Failed to generate insights: {str(e)}"}
 
 
 if __name__ == "__main__":
