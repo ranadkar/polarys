@@ -6,7 +6,7 @@ import styles from '../styles/Dashboard.module.scss';
 // Categorize sources
 const LEFT_SOURCES = ['cnn', 'msnbc', 'nyt', 'nytimes', 'washington post', 'huffpost', 'vox', 'slate', 'the guardian'];
 const RIGHT_SOURCES = ['fox', 'foxnews', 'breitbart', 'wsj', 'wall street journal', 'daily wire', 'newsmax', 'oann', 'the blaze'];
-const SOCIAL_SOURCES = ['reddit', 'twitter', 'x.com', 'r/', 'bluesky', 'bsky'];
+const SOCIAL_SOURCES = ['reddit', 'r/', 'bluesky', 'bsky'];
 
 function categorizeSource(result: SearchResult): 'left' | 'social' | 'right' {
     const lowerSource = result.source.toLowerCase();

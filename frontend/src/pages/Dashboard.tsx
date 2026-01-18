@@ -12,7 +12,7 @@ type DashboardView = 'feed' | 'analysis';
 // Categorize sources
 const LEFT_SOURCES = ['cnn', 'msnbc', 'nyt', 'nytimes', 'washington post', 'huffpost', 'vox', 'slate', 'the guardian'];
 const RIGHT_SOURCES = ['fox', 'foxnews', 'breitbart', 'wsj', 'wall street journal', 'daily wire', 'newsmax', 'oann', 'the blaze'];
-const SOCIAL_SOURCES = ['reddit', 'twitter', 'x.com', 'r/', 'bluesky', 'bsky'];
+const SOCIAL_SOURCES = ['reddit', 'r/', 'bluesky', 'bsky'];
 
 function categorizeSource(result: SearchResult): 'left' | 'social' | 'right' {
     const lowerSource = result.source.toLowerCase();
@@ -93,11 +93,11 @@ export default function Dashboard() {
             <header className={styles.header}>
                 <div className={styles.headerContent}>
                     <div className={styles.headerLeft}>
-                        <div className={styles.logo}>
+                        <div className={styles.logo} onClick={() => navigate('/')}>
                             <div className={styles.logoIcon}>
                                 <span className="material-symbols-outlined">balance</span>
                             </div>
-                            <span className={styles.logoText}>Pulse.</span>
+                            <span className={styles.logoText} onClick={() => navigate('/')}>Polarys.</span>
                         </div>
                         <div className={styles.headerDivider}></div>
                         <nav className={styles.nav}>
@@ -255,11 +255,10 @@ function DashboardFeedView() {
                                 onClick={() => setSelectedArticleIndex(index)}
                             >
                                 <div className={styles.articleListHeader}>
-                                    <span className={`${styles.biasPill} ${
-                                        category === 'left' ? styles.biasPillLeft :
+                                    <span className={`${styles.biasPill} ${category === 'left' ? styles.biasPillLeft :
                                         category === 'right' ? styles.biasPillRight :
-                                        styles.biasPillNeutral
-                                    }`}>
+                                            styles.biasPillNeutral
+                                        }`}>
                                         {getBiasLabel(result)}
                                     </span>
                                     <span className={styles.articleTime}>{formatRelativeTime(result.date)}</span>
@@ -273,11 +272,10 @@ function DashboardFeedView() {
                                     ) : isBluesky ? (
                                         <div className={styles.sourceIconSmallBluesky}><BlueskyIcon /></div>
                                     ) : (
-                                        <div className={`${styles.sourceIconSmall} ${
-                                            category === 'left' ? styles.sourceIconLeft :
+                                        <div className={`${styles.sourceIconSmall} ${category === 'left' ? styles.sourceIconLeft :
                                             category === 'right' ? styles.sourceIconRight :
-                                            ''
-                                        }`}>
+                                                ''
+                                            }`}>
                                             {getSourceAbbreviation(result.source)}
                                         </div>
                                     )}
@@ -308,10 +306,9 @@ function DashboardFeedView() {
                                         return <div className={styles.readerSourceIconBluesky}><BlueskyIcon /></div>;
                                     }
                                     return (
-                                        <div className={`${styles.readerSourceIcon} ${
-                                            category === 'left' ? styles.readerSourceIconLeft :
+                                        <div className={`${styles.readerSourceIcon} ${category === 'left' ? styles.readerSourceIconLeft :
                                             category === 'right' ? styles.readerSourceIconRight : ''
-                                        }`}>
+                                            }`}>
                                             {getSourceAbbreviation(selectedArticle.source)}
                                         </div>
                                     );
@@ -336,11 +333,10 @@ function DashboardFeedView() {
                         {/* Article Meta */}
                         <div className={styles.readerMeta}>
                             <div className={styles.readerMetaItem}>
-                                <span className={`${styles.readerMetaDot} ${
-                                    categorizeSource(selectedArticle) === 'left' ? styles.dotBlue :
+                                <span className={`${styles.readerMetaDot} ${categorizeSource(selectedArticle) === 'left' ? styles.dotBlue :
                                     categorizeSource(selectedArticle) === 'right' ? styles.dotRed :
-                                    styles.dotGray
-                                }`}></span>
+                                        styles.dotGray
+                                    }`}></span>
                                 <span>{getBiasLabel(selectedArticle)} Source</span>
                             </div>
                             <div className={styles.readerMetaDivider}></div>

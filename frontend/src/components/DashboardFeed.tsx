@@ -8,7 +8,7 @@ import styles from '../styles/Dashboard.module.scss';
 // Categorize sources
 const LEFT_SOURCES = ['cnn', 'msnbc', 'nyt', 'nytimes', 'washington post', 'huffpost', 'vox', 'slate', 'the guardian'];
 const RIGHT_SOURCES = ['fox', 'foxnews', 'breitbart', 'wsj', 'wall street journal', 'daily wire', 'newsmax', 'oann', 'the blaze'];
-const SOCIAL_SOURCES = ['reddit', 'twitter', 'x.com', 'r/', 'bluesky', 'bsky'];
+const SOCIAL_SOURCES = ['reddit', 'r/', 'bluesky', 'bsky'];
 
 function categorizeSource(result: SearchResult): 'left' | 'social' | 'right' {
     const lowerSource = result.source.toLowerCase();
@@ -54,12 +54,6 @@ const RedditIcon = () => (
     </svg>
 );
 
-const TwitterIcon = () => (
-    <svg className={styles.socialIcon} fill="currentColor" viewBox="0 0 24 24">
-        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-    </svg>
-);
-
 const BlueskyIcon = () => (
     <svg className={styles.socialIcon} fill="currentColor" viewBox="0 0 600 530">
         <path d="m135.72 44.03c66.496 49.921 138.02 151.14 164.28 205.46 26.262-54.316 97.782-155.54 164.28-205.46 47.98-36.021 125.72-63.892 125.72 24.795 0 17.712-10.155 148.79-16.111 170.07-20.703 73.984-96.144 92.854-163.25 81.433 117.3 19.964 147.14 86.092 82.697 152.22-122.39 125.59-175.91-31.511-189.63-71.766-2.514-7.3797-3.6904-10.832-3.7077-7.8964-0.0174-2.9357-1.1937 0.51669-3.7077 7.8964-13.714 40.255-67.233 197.36-189.63 71.766-64.444-66.128-34.605-132.26 82.697-152.22-67.108 11.421-142.55-7.4491-163.25-81.433-5.9562-21.282-16.111-152.36-16.111-170.07 0-88.687 77.742-60.816 125.72-24.795z" />
@@ -75,15 +69,13 @@ interface FeedItemProps {
 
 const FeedItem = ({ result, summary, isLoading, category }: FeedItemProps) => {
     const isReddit = result.source.toLowerCase().includes('reddit');
-    const isTwitter = result.source.toLowerCase().includes('twitter') || result.source.toLowerCase().includes('x.com');
     const isBluesky = result.source.toLowerCase().includes('bluesky') || result.source.toLowerCase().includes('bsky');
-    const isSocial = isReddit || isTwitter || isBluesky;
+    const isSocial = isReddit || isBluesky;
 
     const categoryClass = category === 'left' ? styles.feedItemLeft : category === 'right' ? styles.feedItemRight : styles.feedItemSocial;
 
     const getSourceIcon = () => {
         if (isReddit) return <RedditIcon />;
-        if (isTwitter) return <TwitterIcon />;
         if (isBluesky) return <BlueskyIcon />;
         return null;
     };
@@ -101,7 +93,7 @@ const FeedItem = ({ result, summary, isLoading, category }: FeedItemProps) => {
                 <div className={styles.feedItemHeader}>
                     <div className={styles.sourceInfo}>
                         {isSocial ? (
-                            <div className={`${styles.sourceIconSocial} ${isReddit ? styles.reddit : isTwitter ? styles.twitter : styles.bluesky}`}>
+                            <div className={`${styles.sourceIconSocial} ${isReddit ? styles.reddit : styles.bluesky}`}>
                                 {getSourceIcon()}
                             </div>
                         ) : (
@@ -281,11 +273,11 @@ const DashboardFeed = () => {
             <header className={styles.header}>
                 <div className={styles.headerContent}>
                     <div className={styles.headerLeft}>
-                        <div className={styles.logo}>
+                        <div className={styles.logo} onClick={() => navigate('/')}>
                             <div className={styles.logoIcon}>
                                 <span className="material-symbols-outlined">balance</span>
                             </div>
-                            <span className={styles.logoText}>Pulse.</span>
+                            <span className={styles.logoText} onClick={() => navigate('/')}>Polarys.</span>
                         </div>
                         <nav className={styles.nav}>
                             <a href="#" className={styles.navLinkActive}>Feed</a>
@@ -350,17 +342,73 @@ const DashboardFeed = () => {
                         </div>
                     )}
 
-                    {/* Feed Grid */}
-                    <div className={styles.feedGrid}>
-                        {selectedResults.map((result, index) => (
-                            <FeedItem
-                                key={result.url || index}
-                                result={result}
-                                summary={summaries.get(result.url) ?? null}
-                                isLoading={loadingUrls.has(result.url)}
-                                category={categorizeSource(result)}
-                            />
-                        ))}
+                    {/* Feed Columns */}
+                    <div className={styles.feedColumns}>
+                        {/* Left Column */}
+                        <div className={styles.feedColumn}>
+                            <div className={styles.feedColumnHeader}>
+                                <div className={`${styles.columnIndicator} ${styles.columnLeft}`}></div>
+                                <span>Left-Leaning</span>
+                            </div>
+                            <div className={styles.feedColumnContent}>
+                                {categorizedResults.left.map((result, index) => (
+                                    <FeedItem
+                                        key={result.url || `left-${index}`}
+                                        result={result}
+                                        summary={summaries.get(result.url) ?? null}
+                                        isLoading={loadingUrls.has(result.url)}
+                                        category="left"
+                                    />
+                                ))}
+                                {categorizedResults.left.length === 0 && (
+                                    <div className={styles.columnEmpty}>No left-leaning sources</div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Social Column */}
+                        <div className={styles.feedColumn}>
+                            <div className={styles.feedColumnHeader}>
+                                <div className={`${styles.columnIndicator} ${styles.columnSocial}`}></div>
+                                <span>Social</span>
+                            </div>
+                            <div className={styles.feedColumnContent}>
+                                {categorizedResults.social.map((result, index) => (
+                                    <FeedItem
+                                        key={result.url || `social-${index}`}
+                                        result={result}
+                                        summary={summaries.get(result.url) ?? null}
+                                        isLoading={loadingUrls.has(result.url)}
+                                        category="social"
+                                    />
+                                ))}
+                                {categorizedResults.social.length === 0 && (
+                                    <div className={styles.columnEmpty}>No social sources</div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Right Column */}
+                        <div className={styles.feedColumn}>
+                            <div className={styles.feedColumnHeader}>
+                                <div className={`${styles.columnIndicator} ${styles.columnRight}`}></div>
+                                <span>Right-Leaning</span>
+                            </div>
+                            <div className={styles.feedColumnContent}>
+                                {categorizedResults.right.map((result, index) => (
+                                    <FeedItem
+                                        key={result.url || `right-${index}`}
+                                        result={result}
+                                        summary={summaries.get(result.url) ?? null}
+                                        isLoading={loadingUrls.has(result.url)}
+                                        category="right"
+                                    />
+                                ))}
+                                {categorizedResults.right.length === 0 && (
+                                    <div className={styles.columnEmpty}>No right-leaning sources</div>
+                                )}
+                            </div>
+                        </div>
                     </div>
 
                     {selectedResults.length === 0 && (

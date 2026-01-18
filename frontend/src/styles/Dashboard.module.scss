@@ -17,9 +17,10 @@ $border-slate: #334155;
     -webkit-font-smoothing: antialiased;
     background-color: $charcoal;
     color: #F8FAFC;
-    min-height: 100vh;
+    height: 100vh;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 // Header
@@ -33,9 +34,8 @@ $border-slate: #334155;
 }
 
 .headerContent {
-    max-width: 1400px;
     margin: 0 auto;
-    padding: 0 1.5rem;
+    padding: 0 1rem;
     height: 4rem;
     display: flex;
     align-items: center;
@@ -63,6 +63,7 @@ $border-slate: #334155;
     align-items: center;
     justify-content: center;
     border-radius: 0.25rem;
+    cursor: pointer;
 
     span {
         font-size: 1.25rem;
@@ -75,6 +76,7 @@ $border-slate: #334155;
     font-size: 1.25rem;
     letter-spacing: -0.025em;
     color: white;
+    cursor: pointer;
 }
 
 .nav {
@@ -120,6 +122,9 @@ $border-slate: #334155;
 .main {
     flex: 1;
     position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .meshGradient {
@@ -133,20 +138,26 @@ $border-slate: #334155;
 
 .container {
     max-width: 1400px;
+    width: 100%;
     margin: 0 auto;
-    padding: 2rem 1.5rem;
+    padding: 1.5rem;
     position: relative;
     z-index: 10;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 // Page Header
 .pageHeader {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-    padding-bottom: 2rem;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
     border-bottom: 1px solid $border-slate;
+    flex-shrink: 0;
 
     @media (min-width: 768px) {
         flex-direction: row;
@@ -239,8 +250,9 @@ $border-slate: #334155;
     background-color: $charcoal-card;
     border: 1px solid $border-slate;
     border-radius: 0.75rem;
-    padding: 1rem 1.5rem;
-    margin-bottom: 2rem;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1rem;
+    flex-shrink: 0;
 }
 
 .progressHeader {
@@ -290,6 +302,109 @@ $border-slate: #334155;
     @media (min-width: 1200px) {
         grid-template-columns: repeat(3, 1fr);
     }
+}
+
+// Feed Columns - Independent Scroll Layout
+.feedColumns {
+    display: flex;
+    gap: 1rem;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+
+    @media (max-width: 1199px) {
+        flex-direction: column;
+        overflow-y: auto;
+    }
+}
+
+.feedColumn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    background-color: rgba($charcoal-card, 0.5);
+    border: 1px solid $border-slate;
+    border-radius: 1rem;
+    overflow: hidden;
+
+    @media (max-width: 1199px) {
+        flex-shrink: 0;
+        min-height: 400px;
+        max-height: 500px;
+    }
+}
+
+.feedColumnHeader {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid $border-slate;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #94a3b8;
+    background-color: rgba(0, 0, 0, 0.2);
+    flex-shrink: 0;
+}
+
+.columnIndicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.columnLeft {
+    background-color: $politic-lib;
+}
+
+.columnSocial {
+    background-color: #64748b;
+}
+
+.columnRight {
+    background-color: $politic-cons;
+}
+
+.feedColumnContent {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: $border-slate;
+        border-radius: 10px;
+
+        &:hover {
+            background: #475569;
+        }
+    }
+}
+
+.columnEmpty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    color: #64748b;
+    font-size: 0.875rem;
+    font-style: italic;
+    text-align: center;
+    flex: 1;
 }
 
 // Feed Item
@@ -537,10 +652,14 @@ $border-slate: #334155;
 }
 
 @keyframes pulse {
-    0%, 80%, 100% {
+
+    0%,
+    80%,
+    100% {
         transform: scale(0);
         opacity: 0.5;
     }
+
     40% {
         transform: scale(1);
         opacity: 1;
@@ -680,6 +799,7 @@ $light-text-muted: #64748b;
 
     .logoText {
         color: $light-text;
+        cursor: pointer;
     }
 
     .navLink {
@@ -748,6 +868,32 @@ $light-text-muted: #64748b;
 
     .emptyState h3 {
         color: $light-text;
+    }
+
+    // Feed Columns Light Mode
+    .feedColumn {
+        background-color: rgba($light-surface, 0.8);
+        border-color: $light-border;
+    }
+
+    .feedColumnHeader {
+        background-color: #F1F5F9;
+        border-bottom-color: $light-border;
+        color: #64748b;
+    }
+
+    .feedColumnContent {
+        &::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+
+            &:hover {
+                background: #94a3b8;
+            }
+        }
+    }
+
+    .columnEmpty {
+        color: #94a3b8;
     }
 
     // Analysis Light Mode

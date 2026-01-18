@@ -5,7 +5,7 @@ import styles from '../styles/Loading.module.scss';
 
 const stages = [
     { id: 'reddit', label: 'Scanning Reddit', icon: 'forum', source: 'r/politics, r/conservative, r/news' },
-    { id: 'twitter', label: 'Analyzing Twitter/X', icon: 'tag', source: 'trending hashtags & threads' },
+    { id: 'bluesky', label: 'Analyzing Bluesky', icon: 'tag', source: 'trending hashtags & threads' },
     { id: 'news', label: 'Processing News', icon: 'newspaper', source: 'Reuters, AP, NewsAPI' },
     { id: 'synthesis', label: 'Synthesizing Data', icon: 'hub', source: 'cross-referencing sources' },
 ];

@@ -70,7 +70,7 @@ const Landing = () => {
                 </div>
                 <div className={styles.dataSource}>
                   <span className="material-symbols-outlined">database</span>
-                  <span>Reddit / Twitter / NewsAPI</span>
+                  <span>Reddit / BlueSky / NewsAPI</span>
                 </div>
                 <div className={styles.nodeTags}>
                   <span className={styles.nodeTagBlue}>LIB_NODES</span>
@@ -92,12 +92,12 @@ const Landing = () => {
                 </div>
                 <h2 className={styles.sectionTitle}>Liberal Narrative Analysis</h2>
                 <p className={styles.sectionDescription}>
-                  Our algorithm maps the semantic density of Liberal discourse across Reddit, Twitter, and major news outlets. We isolate specific value-anchors—such as systemic equity and collective welfare—that define the core arguments within these information silos.
+                  Our algorithm maps the semantic density of Liberal discourse across major news outlets and social media platforms such as Reddit and bluesky. We isolate specific value-anchors—such as systemic equity and collective welfare—that define the core arguments within these information silos.
                 </p>
                 <div className={styles.featureCards}>
                   <div className={`${styles.featureCard} ${styles.featureCardBlue}`}>
                     <h4 className={styles.featureCardTitle}>Signal Identification</h4>
-                    <p className={styles.featureCardDesc}>Identifying cross-citation patterns across Reddit threads, Twitter conversations, and news articles.</p>
+                    <p className={styles.featureCardDesc}>Identifying cross-citation patterns across Reddit threads, Bluesky conversations, and news articles.</p>
                   </div>
                   <div className={`${styles.featureCard} ${styles.featureCardBlue}`}>
                     <h4 className={styles.featureCardTitle}>Sentiment Variance</h4>
@@ -186,12 +186,12 @@ const Landing = () => {
                 </div>
                 <h2 className={styles.sectionTitle}>Conservative Reality Anchors</h2>
                 <p className={styles.sectionDescription}>
-                  We analyze Conservative discourse across Reddit, Twitter, and news channels to detect high-relevance topics like institutional trust and fiscal heritage. Our tools filter through the noise to map the underlying policy frameworks.
+                  We analyze Conservative discourse across Reddit, Bluesky, and news channels to detect high-relevance topics like institutional trust and fiscal heritage. Our tools filter through the noise to map the underlying policy frameworks.
                 </p>
                 <div className={styles.featureCards}>
                   <div className={`${styles.featureCard} ${styles.featureCardRed}`}>
                     <h4 className={styles.featureCardTitle}>Citation Verification</h4>
-                    <p className={styles.featureCardDesc}>Tracing primary source usage across Reddit, Twitter, and news outlets to distinguish grassroots sentiment from coordinated messaging.</p>
+                    <p className={styles.featureCardDesc}>Tracing primary source usage across Reddit, Bluesky, and news outlets to distinguish grassroots sentiment from coordinated messaging.</p>
                   </div>
                   <div className={`${styles.featureCard} ${styles.featureCardRed}`}>
                     <h4 className={styles.featureCardTitle}>Thematic Stability</h4>
@@ -311,7 +311,7 @@ const Landing = () => {
             <div className={styles.footerBrand}>
               <div className={styles.footerLogo}>
                 <span className="material-symbols-outlined">balance</span>
-                <span className={styles.footerLogoText}>Pulse.</span>
+                <span className={styles.footerLogoText}>Polarys.</span>
               </div>
               <p className={styles.footerTagline}>
                 An advanced analytical framework for the modern citizen. We believe that clarity in disagreement is the first step toward national health.

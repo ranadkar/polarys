@@ -9,7 +9,7 @@ import styles from '../styles/SelectSources.module.scss';
 // Categorize sources
 const LEFT_SOURCES = ['cnn', 'msnbc', 'nyt', 'nytimes', 'washington post', 'huffpost', 'vox', 'slate', 'the guardian'];
 const RIGHT_SOURCES = ['fox', 'foxnews', 'breitbart', 'wsj', 'wall street journal', 'daily wire', 'newsmax', 'oann', 'the blaze'];
-const SOCIAL_SOURCES = ['reddit', 'twitter', 'x.com', 'r/', 'bluesky', 'bsky'];
+const SOCIAL_SOURCES = ['reddit', 'r/', 'bluesky', 'bsky'];
 
 function categorizeSource(result: SearchResult): 'left' | 'social' | 'right' {
     const lowerSource = result.source.toLowerCase();
@@ -82,12 +82,6 @@ const RedditIcon = () => (
     </svg>
 );
 
-// Twitter/X SVG icon
-const TwitterIcon = () => (
-    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-    </svg>
-);
 
 // Bluesky SVG icon
 const BlueskyIcon = () => (
@@ -137,7 +131,6 @@ const SentimentBar = ({ score }: { score: number }) => {
 
 const SourceCard = ({ result, category, isSelected, onToggle }: SourceCardProps) => {
     const isReddit = result.source.toLowerCase().includes('reddit') || result.source.toLowerCase() === 'reddit';
-    const isTwitter = result.source.toLowerCase().includes('twitter') || result.source.toLowerCase().includes('x.com');
     const isBluesky = result.source.toLowerCase().includes('bluesky') || result.source.toLowerCase().includes('bsky');
 
     const cardClass = category === 'left' ? styles.cardBlue : category === 'right' ? styles.cardRed : styles.cardNeutral;
@@ -181,10 +174,6 @@ const SourceCard = ({ result, category, isSelected, onToggle }: SourceCardProps)
                     {isReddit ? (
                         <div className={styles.sourceIconReddit}>
                             <RedditIcon />
-                        </div>
-                    ) : isTwitter ? (
-                        <div className={styles.sourceIconTwitter}>
-                            <TwitterIcon />
                         </div>
                     ) : isBluesky ? (
                         <div className={styles.sourceIconBluesky}>
@@ -393,11 +382,11 @@ const SelectSources = () => {
             <header className={styles.header}>
                 <div className={styles.headerContent}>
                     <div className={styles.headerLeft}>
-                        <div className={styles.logo}>
+                        <div className={styles.logo} onClick={() => navigate('/')}>
                             <div className={styles.logoIcon}>
                                 <span className="material-symbols-outlined">balance</span>
                             </div>
-                            <span className={styles.logoText}>Pulse.</span>
+                            <span className={styles.logoText} onClick={() => navigate('/')}>Polarys.</span>
                         </div>
                         <div className={styles.divider}></div>
                         <div className={styles.topicBadge}>
