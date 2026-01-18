@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../lib/store';
 import { addSummary } from '../lib/searchSlice';
 import { fetchSummary, type SearchResult } from '../lib/search';
@@ -78,13 +78,12 @@ const BlueskyIcon = () => (
 
 export default function Dashboard() {
     const navigate = useNavigate();
-    const { results } = useAppSelector((state) => state.search);
+    const { results, selectedIndices } = useAppSelector((state) => state.search);
     const [currentView, setCurrentView] = useState<DashboardView>('feed');
 
-    // Redirect if no results
-    if (results.length === 0) {
-        navigate('/');
-        return null;
+    // Redirect if no results or no selected sources - use Navigate component for proper declarative redirect
+    if (results.length === 0 || selectedIndices.length === 0) {
+        return <Navigate to="/" replace />;
     }
 
     return (
@@ -125,7 +124,7 @@ export default function Dashboard() {
             {currentView === 'feed' ? (
                 <DashboardFeedView />
             ) : (
-                <main className={styles.main}>
+                <main className={`${styles.main} ${currentView === 'analysis' ? styles.analysisScrollableContent : ''}`}>
                     <div className={styles.meshGradient}></div>
                     <div className={styles.container}>
                         <DashboardAnalysis onSwitchToFeed={() => setCurrentView('feed')} />

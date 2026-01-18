@@ -87,6 +87,96 @@ const DashboardAnalysis = ({ onSwitchToFeed: _onSwitchToFeed }: DashboardAnalysi
 
     const totalSources = selectedResults.length;
 
+    // Export report function
+    const exportReport = () => {
+        const date = new Date().toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        const divider = '═'.repeat(60);
+        const sectionDivider = '─'.repeat(60);
+
+        let report = `
+${divider}
+                    PERSPECTIVES ANALYSIS REPORT
+${divider}
+
+Generated: ${date}
+Search Query: "${query}"
+Total Sources Analyzed: ${totalSources}
+
+${sectionDivider}
+                         SOURCE BREAKDOWN
+${sectionDivider}
+
+  • Left-Leaning Sources:  ${categorizedResults.left.length}
+  • Social Sources:        ${categorizedResults.social.length}
+  • Right-Leaning Sources: ${categorizedResults.right.length}
+
+${sectionDivider}
+                       SENTIMENT ANALYSIS
+${sectionDivider}
+
+CONSERVATIVE BASE
+  Sentiment Score: ${sentimentStats.rightScore}/10
+  Position: ${sentimentStats.rightRaw > 0 ? 'Constructive' : sentimentStats.rightRaw < -0.3 ? 'Hostile' : 'Neutral'}
+
+LIBERAL BASE
+  Sentiment Score: ${sentimentStats.leftScore}/10
+  Position: ${sentimentStats.leftRaw > 0 ? 'Constructive' : sentimentStats.leftRaw < -0.3 ? 'Hostile' : 'Neutral'}
+
+${sectionDivider}
+                        KEY TAKEAWAYS
+${sectionDivider}
+
+CONSERVATIVE PERSPECTIVE:
+${insights?.key_takeaway_right ? `  ${insights.key_takeaway_right}` : '  No insights available'}
+
+LIBERAL PERSPECTIVE:
+${insights?.key_takeaway_left ? `  ${insights.key_takeaway_left}` : '  No insights available'}
+
+${sectionDivider}
+                    COMMON GROUND SYNTHESIS
+${sectionDivider}
+${insights?.common_ground?.length ? insights.common_ground.map((item, index) => `
+Topic ${String(index + 1).padStart(2, '0')}: ${item.title}
+  ${item.bullet_point}
+`).join('\n') : '\nNo common ground analysis available\n'}
+
+${sectionDivider}
+                       SOURCES ANALYZED
+${sectionDivider}
+
+LEFT-LEANING SOURCES:
+${categorizedResults.left.length > 0 ? categorizedResults.left.map(r => `  • ${r.source}: ${r.title}`).join('\n') : '  None'}
+
+SOCIAL SOURCES:
+${categorizedResults.social.length > 0 ? categorizedResults.social.map(r => `  • ${r.source}: ${r.title}`).join('\n') : '  None'}
+
+RIGHT-LEANING SOURCES:
+${categorizedResults.right.length > 0 ? categorizedResults.right.map(r => `  • ${r.source}: ${r.title}`).join('\n') : '  None'}
+
+${divider}
+                      END OF REPORT
+${divider}
+`;
+
+        // Create and download the file
+        const blob = new Blob([report], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `perspectives-report-${query.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.txt`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    };
+
     return (
         <div className={styles.analysisContainer}>
             {/* Page Header */}
@@ -99,7 +189,7 @@ const DashboardAnalysis = ({ onSwitchToFeed: _onSwitchToFeed }: DashboardAnalysi
                     </p>
                 </div>
                 <div className={styles.analysisActions}>
-                    <button className={styles.exportButton}>
+                    <button className={styles.exportButton} onClick={exportReport}>
                         <span className="material-symbols-outlined">download</span>
                         Export Report
                     </button>

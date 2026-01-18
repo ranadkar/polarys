@@ -122,9 +122,26 @@ $border-slate: #334155;
 .main {
     flex: 1;
     position: relative;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: $border-slate transparent;
+
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.1);
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: $border-slate;
+        border-radius: 10px;
+
+        &:hover {
+            background: #475569;
+        }
+    }
 }
 
 .meshGradient {
@@ -143,10 +160,6 @@ $border-slate: #334155;
     padding: 1.5rem;
     position: relative;
     z-index: 10;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
 }
 
 // Page Header
@@ -792,6 +805,22 @@ $light-text-muted: #64748b;
         color: $light-text;
     }
 
+    .main {
+        scrollbar-color: #CBD5E1 transparent;
+
+        &::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+
+            &:hover {
+                background: #94a3b8;
+            }
+        }
+    }
+
     .header {
         background-color: rgba($light-surface, 0.8);
         border-bottom-color: $light-border;
@@ -1349,6 +1378,7 @@ $light-text-muted: #64748b;
     font-size: 0.875rem;
     font-style: italic;
 }
+
 
 // Analysis Summary
 .analysisSummary {
