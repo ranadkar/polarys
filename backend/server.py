@@ -1,12 +1,13 @@
 import asyncio
 import os
 import re
+import uuid
 import uvicorn
 from datetime import datetime
 
 import asyncpraw
 from dotenv import load_dotenv
-from fastapi import FastAPI, Body
+from fastapi import FastAPI, Body, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from openai import OpenAI
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
@@ -71,8 +72,9 @@ bluesky_logged_in = False
 
 sentiment_analyzer = SentimentIntensityAnalyzer()
 
-# Global storage for articles keyed by URL
-articles_by_url = {}
+# Global storage for sessions keyed by session_id
+# Each session contains articles_by_url dict
+sessions = {}
 
 # Global cache for scraped full content
 scraped_content_cache = {}
@@ -143,6 +145,10 @@ async def root():
 @app.get("/search")
 async def search(q: str):
     global bluesky_logged_in
+
+    # Generate a new session ID for this search
+    session_id = str(uuid.uuid4())
+    sessions[session_id] = {}
 
     # Login to Bluesky if not already logged in
     if not bluesky_logged_in:
@@ -217,7 +223,7 @@ async def search(q: str):
             "date": to_epoch_time(article["publishedAt"]),
         }
         outputs.append(output)
-        articles_by_url[article["url"]] = output
+        sessions[session_id][article["url"]] = output
 
     # Analyze sentiment and classify bias for Reddit posts
     bias_tasks = [
@@ -237,7 +243,7 @@ async def search(q: str):
         post["sentiment"] = sentiment
         post["sentiment_score"] = sentiment_score
         outputs.append(post)
-        articles_by_url[post["url"]] = post
+        sessions[session_id][post["url"]] = post
 
     # Process Bluesky posts (now returns list directly like Reddit)
     bluesky_posts = bluesky_result if bluesky_result else []
@@ -258,17 +264,23 @@ async def search(q: str):
         post["sentiment"] = sentiment
         post["sentiment_score"] = sentiment_score
         outputs.append(post)
-        articles_by_url[post["url"]] = post
+        sessions[session_id][post["url"]] = post
 
-    return outputs
+    return {"session_id": session_id, "results": outputs}
 
 
 @app.get("/summary")
-async def summary(url: str):
+async def summary(url: str, session_id: str):
     """Generate a summary for a given article URL."""
-    # Check if the URL exists in our cache
+    # Check if the session exists
+    if session_id not in sessions:
+        raise HTTPException(status_code=404, detail="Session not found. Please search for content first.")
+
+    articles_by_url = sessions[session_id]
+
+    # Check if the URL exists in our session
     if url not in articles_by_url:
-        return {"error": "URL not found. Please search for content first."}
+        raise HTTPException(status_code=404, detail="URL not found in this session. Please search for content first.")
 
     article = articles_by_url[url]
     source = article.get("source", "")
@@ -338,11 +350,12 @@ Summary (in English):"""
 
 
 @app.post("/insights")
-async def insights(articles: list[dict] = Body(...)):
+async def insights(session_id: str = Body(...), articles: list[dict] = Body(...)):
     """
     Generate key takeaways for left and right perspectives, plus common ground.
 
     Args:
+        session_id: The session ID from the search endpoint
         articles: List of dicts with 'url' and 'bias' keys
 
     Returns:
@@ -352,6 +365,12 @@ async def insights(articles: list[dict] = Body(...)):
             "common_ground": str
         }
     """
+    # Check if the session exists
+    if session_id not in sessions:
+        raise HTTPException(status_code=404, detail="Session not found. Please search for content first.")
+
+    articles_by_url = sessions[session_id]
+
     # Separate articles by bias
     left_articles = []
     right_articles = []
