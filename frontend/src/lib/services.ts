@@ -104,3 +104,50 @@ export async function fetchInsights(articles: ArticleForInsights[], sessionId: s
 
     return response.json() as Promise<InsightsResult>;
 }
+
+// Chat types
+export interface FollowUpSuggestion {
+    short: string;  // Short label for UI bubble (e.g. "Conservative view?")
+    full: string;   // Full message to send when clicked
+}
+
+export interface ChatResponse {
+    response: string;  // AI response (under 400 chars)
+    follow_up_suggestions: FollowUpSuggestion[];  // 0-3 follow-up suggestions
+}
+
+export interface ChatMessage {
+    role: 'user' | 'assistant';
+    content: string;
+    follow_ups?: FollowUpSuggestion[];  // Only present on assistant messages
+}
+
+// Simplified message format for API (no follow_ups needed in history)
+export interface ChatHistoryMessage {
+    role: 'user' | 'assistant';
+    content: string;
+}
+
+export async function sendChatMessage(
+    sessionId: string,
+    message: string,
+    history: ChatHistoryMessage[]
+): Promise<ChatResponse> {
+    const response = await fetch(`${API_BASE_URL}/chat`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            session_id: sessionId,
+            message: message,
+            history: history,  // Include conversation history for context
+        }),
+    });
+
+    if (!response.ok) {
+        throw new Error(`Chat request failed with status ${response.status}`);
+    }
+
+    return response.json() as Promise<ChatResponse>;
+}

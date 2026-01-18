@@ -2,11 +2,13 @@ import { configureStore } from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from 'react-redux';
 import searchReducer from './searchSlice';
 import themeReducer from './themeSlice';
+import chatReducer from './chatSlice';
 
 export const store = configureStore({
   reducer: {
     search: searchReducer,
     theme: themeReducer,
+    chat: chatReducer,
   },
 });
 

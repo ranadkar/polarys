@@ -5,6 +5,7 @@ import { addSummary } from '../lib/searchSlice';
 import { fetchSummary, type SearchResult } from '../lib/services';
 import DashboardAnalysis from '../components/DashboardAnalysis';
 import ThemeToggle from '../components/ThemeToggle';
+import SidebarAI from '../components/SidebarAI';
 import styles from '../styles/Dashboard.module.scss';
 
 type DashboardView = 'feed' | 'analysis';
@@ -131,6 +132,9 @@ export default function Dashboard() {
                     </div>
                 </main>
             )}
+
+            {/* AI Assistant Sidebar */}
+            <SidebarAI />
         </div>
     );
 }
